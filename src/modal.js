@@ -1,361 +1,457 @@
-import { PRODUCTS, getProductById } from './products.js';
-import { registrarPedido, supabase } from './supabase.js';
+import { getProductById } from './products.js';
+import { addToCart, clearCart, getCart, removeFromCart, updateCartQuantity } from './cart-store.js';
+import { registrarPedidos, supabase } from './supabase.js';
 
-const PENDING_ORDER_KEY = 'targetsticker_pending_order';
+const PENDING_AUTH_KEY = 'targetsticker_pending_cart_auth';
+const CART_PROFILE_PREFIX = 'targetsticker_profile_';
+const euroFormatter = new Intl.NumberFormat('es-ES', { style: 'currency', currency: 'EUR' });
+
+function escapeHtml(value) {
+  return String(value).replace(/[&<>"']/g, (character) => ({
+    '&': '&amp;',
+    '<': '&lt;',
+    '>': '&gt;',
+    '"': '&quot;',
+    "'": '&#39;'
+  })[character]);
+}
 
 export function initCheckoutModal() {
-  const dialog = document.getElementById('checkout-modal');
-  if (!dialog) return;
+  const accountDialog = document.getElementById('checkout-modal');
+  const cartDialog = document.getElementById('cart-dialog');
+  if (!accountDialog || !cartDialog) return;
 
-  const closeBtn = document.getElementById('modal-close-btn');
-  const checkoutView = document.getElementById('modal-checkout-view');
-  const successView = document.getElementById('modal-success-view');
+  const accountForm = document.getElementById('reservation-form');
+  const accountSubmit = document.getElementById('reservation-submit-btn');
   const emailInput = document.getElementById('checkout-email');
   const firstNameInput = document.getElementById('checkout-first-name');
   const lastNameInput = document.getElementById('checkout-last-name');
-  const reservationForm = document.getElementById('reservation-form');
-  const submitBtn = document.getElementById('reservation-submit-btn');
-  const modelSelect = document.getElementById('checkout-model-select');
-  const modalSelectedImg = document.getElementById('modal-selected-img');
-  const modalSelectedName = document.getElementById('modal-selected-name');
-  const modalSelectedPrice = document.getElementById('modal-selected-price');
-  const reviewName = document.getElementById('checkout-review-name');
-  const reviewPrice = document.getElementById('checkout-review-price');
-  const modalErrorMsg = document.getElementById('modal-error-message');
-  const modalInfoMsg = document.getElementById('modal-info-message');
-  const successDoneBtn = document.getElementById('success-done-btn');
-  const stepTabs = [...dialog.querySelectorAll('[data-checkout-step]')];
-  const stepPanels = [...dialog.querySelectorAll('[data-checkout-panel]')];
-  let activeModel = PRODUCTS[0];
-  let currentSession = null;
-  let isProcessing = false;
-  let currentStep = 1;
-  let maxVisitedStep = 1;
+  const infoMessage = document.getElementById('modal-info-message');
+  const errorMessage = document.getElementById('modal-error-message');
+  const accountReviewEmail = document.getElementById('account-review-email');
+  const signedInView = document.getElementById('account-signed-in');
+  const signOutButton = document.getElementById('account-sign-out');
+  const accountSignedInEmail = document.getElementById('account-signed-in-email');
+  const cartItems = document.getElementById('cart-items');
+  const cartEmpty = document.getElementById('cart-empty');
+  const cartSuccess = document.getElementById('cart-success');
+  const cartCount = document.getElementById('cart-count');
+  const cartTotal = document.getElementById('cart-total');
+  const cartSubtitle = document.getElementById('cart-subtitle');
+  const cartItemsView = document.getElementById('cart-items-view');
+  const cartReviewView = document.getElementById('cart-review-view');
+  const cartFooter = document.getElementById('cart-footer');
+  const cartReviewFooter = document.getElementById('cart-review-footer');
+  const cartReviewItems = document.getElementById('cart-review-items');
+  const cartReviewTotal = document.getElementById('cart-review-total');
+  const cartError = document.getElementById('cart-error');
+  const cartFirstName = document.getElementById('cart-first-name');
+  const cartLastName = document.getElementById('cart-last-name');
+  const cartCheckout = document.getElementById('cart-checkout');
+  let currentUser = null;
+  let isSendingLink = false;
+  let isSubmittingOrder = false;
+  let isCompletingSignIn = false;
+  let accountStep = 1;
+  let maxAccountStep = 1;
 
-  // Popular el selector de modelos
-  if (modelSelect) {
-    modelSelect.innerHTML = PRODUCTS.map(p => `
-      <option value="${p.id}">${p.name} - ${p.priceFormatted}</option>
-    `).join('');
-
-    modelSelect.addEventListener('change', (e) => {
-      updateSelectedModel(e.target.value);
-    });
+  function getPendingAuth() {
+    const stored = localStorage.getItem(PENDING_AUTH_KEY);
+    return stored ? JSON.parse(stored) : null;
   }
 
-  function updateSelectedModel(productId) {
-    activeModel = getProductById(productId);
-    if (modalSelectedImg) modalSelectedImg.src = activeModel.image;
-    if (modalSelectedName) modalSelectedName.textContent = activeModel.name;
-    if (modalSelectedPrice) modalSelectedPrice.textContent = `${activeModel.priceFormatted} · Envío gratis`;
-    if (reviewName) reviewName.textContent = activeModel.name;
-    if (reviewPrice) reviewPrice.textContent = activeModel.priceFormatted;
-    if (modelSelect && modelSelect.value !== activeModel.id) {
-      modelSelect.value = activeModel.id;
-    }
+  function setAccountMessage(message, type) {
+    infoMessage.classList.toggle('hidden', type !== 'info');
+    errorMessage.classList.toggle('hidden', type !== 'error');
+    if (type === 'info') infoMessage.textContent = message;
+    if (type === 'error') errorMessage.textContent = message;
   }
 
-  function updateCheckoutStep(step) {
-    currentStep = step;
-    if (modalErrorMsg) modalErrorMsg.classList.add('hidden');
-    if (modalInfoMsg) modalInfoMsg.classList.add('hidden');
-    stepTabs.forEach((tab) => {
+  function setAccountStep(step) {
+    accountStep = step;
+    infoMessage.classList.add('hidden');
+    errorMessage.classList.add('hidden');
+    accountDialog.querySelectorAll('[data-checkout-step]').forEach((tab) => {
       const tabStep = Number(tab.dataset.checkoutStep);
-      const isActive = tabStep === step;
-      tab.classList.toggle('is-active', isActive);
+      const active = tabStep === step;
+      tab.classList.toggle('is-active', active);
       tab.classList.toggle('is-complete', tabStep < step);
-      tab.setAttribute('aria-selected', String(isActive));
-      tab.tabIndex = isActive ? 0 : -1;
-      tab.disabled = tabStep > maxVisitedStep;
+      tab.setAttribute('aria-selected', String(active));
+      tab.tabIndex = active ? 0 : -1;
+      tab.disabled = tabStep > maxAccountStep;
     });
-    stepPanels.forEach((panel) => {
-      const isActive = Number(panel.dataset.checkoutPanel) === step;
-      panel.hidden = !isActive;
-      panel.classList.toggle('hidden', !isActive);
+    accountDialog.querySelectorAll('[data-checkout-panel]').forEach((panel) => {
+      const active = Number(panel.dataset.checkoutPanel) === step;
+      panel.hidden = !active;
+      panel.classList.toggle('hidden', !active);
     });
   }
 
-  function showError(msg) {
-    if (!modalErrorMsg) return;
-    modalErrorMsg.textContent = msg;
-    modalErrorMsg.classList.remove('hidden');
-    if (modalInfoMsg) modalInfoMsg.classList.add('hidden');
-  }
-
-  function showInfo(msg) {
-    if (!modalInfoMsg) return;
-    modalInfoMsg.textContent = msg;
-    modalInfoMsg.classList.remove('hidden');
-    if (modalErrorMsg) modalErrorMsg.classList.add('hidden');
-  }
-
-  function getPendingOrder() {
-    try {
-      return JSON.parse(localStorage.getItem(PENDING_ORDER_KEY) || 'null');
-    } catch {
-      return null;
+  function showAccountDialog() {
+    if (currentUser) {
+      signedInView.hidden = false;
+      signedInView.classList.remove('hidden');
+      accountForm.hidden = true;
+      accountForm.classList.add('hidden');
+      accountSignedInEmail.textContent = currentUser.email || '';
+    } else {
+      signedInView.hidden = true;
+      signedInView.classList.add('hidden');
+      accountForm.hidden = false;
+      accountForm.classList.remove('hidden');
+      maxAccountStep = 1;
+      setAccountStep(1);
     }
+    if (!accountDialog.open) accountDialog.showModal();
   }
 
-  function showConfirmation(pending) {
-    const model = getProductById(pending.productId);
-    if (checkoutView) checkoutView.classList.add('hidden');
-    if (successView) successView.classList.remove('hidden');
-    if (!dialog.open) dialog.showModal();
-
-    const successEmail = document.getElementById('success-summary-email');
-    const successModel = document.getElementById('success-summary-model');
-    const successOrderDate = document.getElementById('success-summary-date');
-    const successBatchDate = document.getElementById('success-batch-date');
-    if (successEmail) successEmail.textContent = pending.email;
-    if (successModel) successModel.textContent = model.name;
-    if (successOrderDate) {
-      successOrderDate.textContent = new Date().toLocaleDateString('es-ES', {
-        day: '2-digit',
-        month: 'long',
-        year: 'numeric'
-      });
-    }
-    if (successBatchDate) {
-      const in7Days = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
-      successBatchDate.textContent = in7Days.toLocaleDateString('es-ES', {
-        weekday: 'long',
-        day: 'numeric',
-        month: 'long'
-      });
-    }
+  function getCartSummary() {
+    if (!currentUser) return [];
+    return getCart(currentUser.id)
+      .map((item) => ({ ...item, product: getProductById(item.productId) }))
+      .filter((item) => item.product.id === item.productId);
   }
 
-  async function processPendingOrder(user) {
-    const pending = getPendingOrder();
-    if (!supabase || !user || !pending || isProcessing) return;
-    if (user.email?.toLowerCase() !== pending.email.toLowerCase()) {
-      showError('Inicia sesión con el mismo correo al que enviamos el enlace.');
+  function getSummaryTotal(items) {
+    return items.reduce((total, item) => total + item.product.price * item.quantity, 0);
+  }
+
+  function updateCartBadge() {
+    const count = currentUser
+      ? getCart(currentUser.id).reduce((total, item) => total + item.quantity, 0)
+      : 0;
+    cartCount.textContent = String(count);
+    cartCount.classList.toggle('is-empty', count === 0);
+    cartCheckout.disabled = count === 0;
+  }
+
+  function renderCart() {
+    if (!currentUser) {
+      cartItems.replaceChildren();
+      cartEmpty.classList.remove('hidden');
+      cartItems.classList.add('hidden');
+      cartTotal.textContent = euroFormatter.format(0);
+      cartSubtitle.textContent = 'Inicia sesión para ver tu cesta';
+      updateCartBadge();
       return;
     }
 
-    isProcessing = true;
-    if (submitBtn) submitBtn.disabled = true;
-    try {
-      const result = await registrarPedido({
-        userId: user.id,
-        nombre: pending.firstName,
-        apellidos: pending.lastName,
-        email: user.email,
-        modelo: getProductById(pending.productId).name,
-        tags: getProductById(pending.productId).tags,
-        estado: 'interesado_7_dias'
+    const items = getCartSummary();
+    const total = getSummaryTotal(items);
+    cartItems.classList.toggle('hidden', items.length === 0);
+    cartEmpty.classList.toggle('hidden', items.length !== 0);
+    cartSuccess.classList.add('hidden');
+    cartTotal.textContent = euroFormatter.format(total);
+    cartSubtitle.textContent = `${items.reduce((sum, item) => sum + item.quantity, 0)} ${items.length === 1 ? 'artículo' : 'artículos'} · envío gratis`;
+    cartItems.innerHTML = items.map(({ product, quantity }) => `
+      <article class="cart-line">
+        <img src="${escapeHtml(product.image)}" alt="${escapeHtml(product.name)}" class="cart-line-image" />
+        <div class="min-w-0 flex-1">
+          <h3 class="line-clamp-2 text-sm font-bold text-slate-900">${escapeHtml(product.name)}</h3>
+          <p class="mt-1 text-xs font-extrabold text-slate-700">${product.priceFormatted} <span class="font-medium text-emerald-700">· envío gratis</span></p>
+          <div class="mt-2 flex items-center gap-2">
+            <button type="button" class="cart-quantity-button" data-quantity="${escapeHtml(product.id)}" data-change="-1" aria-label="Quitar una unidad">−</button>
+            <span class="min-w-5 text-center text-xs font-bold">${quantity}</span>
+            <button type="button" class="cart-quantity-button" data-quantity="${escapeHtml(product.id)}" data-change="1" aria-label="Añadir una unidad">+</button>
+            <button type="button" class="ml-auto text-xs font-semibold text-slate-500 underline hover:text-rose-600" data-remove="${escapeHtml(product.id)}">Quitar</button>
+          </div>
+        </div>
+      </article>
+    `).join('');
+    cartItems.querySelectorAll('[data-quantity]').forEach((button) => {
+      button.addEventListener('click', () => {
+        const item = getCart(currentUser.id).find((entry) => entry.productId === button.dataset.quantity);
+        if (item) updateCartQuantity(currentUser.id, item.productId, item.quantity + Number(button.dataset.change));
+        renderCart();
       });
+    });
+    cartItems.querySelectorAll('[data-remove]').forEach((button) => {
+      button.addEventListener('click', () => {
+        removeFromCart(currentUser.id, button.dataset.remove);
+        renderCart();
+      });
+    });
+    updateCartBadge();
+  }
 
-      if (!result.success) throw new Error(result.error || 'No se pudo guardar la solicitud.');
-      localStorage.removeItem(PENDING_ORDER_KEY);
-      showConfirmation(pending);
-    } catch (err) {
-      console.error('Error al registrar interés:', err);
-      showError('No se pudo guardar tu solicitud. Inténtalo de nuevo en unos minutos.');
-    } finally {
-      isProcessing = false;
-      if (submitBtn) submitBtn.disabled = false;
+  function renderOrderReview() {
+    const items = getCartSummary();
+    cartReviewItems.innerHTML = items.map(({ product, quantity }) => `
+      <div class="flex items-start justify-between gap-3 text-xs">
+        <span class="text-slate-600">${quantity} × ${escapeHtml(product.name)}</span>
+        <strong class="shrink-0 text-slate-900">${euroFormatter.format(product.price * quantity)}</strong>
+      </div>
+    `).join('');
+    cartReviewTotal.textContent = euroFormatter.format(getSummaryTotal(items));
+    const profile = JSON.parse(localStorage.getItem(`${CART_PROFILE_PREFIX}${encodeURIComponent(currentUser.id)}`) || 'null');
+    cartFirstName.value = profile?.firstName || currentUser.user_metadata?.nombre || '';
+    cartLastName.value = profile?.lastName || currentUser.user_metadata?.apellidos || '';
+    cartError.classList.add('hidden');
+    cartItemsView.hidden = true;
+    cartItemsView.classList.add('hidden');
+    cartFooter.hidden = true;
+    cartFooter.classList.add('hidden');
+    cartReviewView.hidden = false;
+    cartReviewView.classList.remove('hidden');
+    cartReviewFooter.hidden = false;
+    cartReviewFooter.classList.remove('hidden');
+    cartSubtitle.textContent = 'Confirma tu solicitud';
+  }
+
+  function showCartDialog() {
+    cartSuccess.classList.add('hidden');
+    cartItemsView.hidden = false;
+    cartItemsView.classList.remove('hidden');
+    cartFooter.hidden = false;
+    cartFooter.classList.remove('hidden');
+    cartReviewView.hidden = true;
+    cartReviewView.classList.add('hidden');
+    cartReviewFooter.hidden = true;
+    cartReviewFooter.classList.add('hidden');
+    renderCart();
+    if (!cartDialog.open) cartDialog.showModal();
+  }
+
+  async function completeSignIn(session) {
+    currentUser = session?.user || null;
+    updateCartBadge();
+    if (!currentUser) return;
+
+    const pending = getPendingAuth();
+    if (!pending) {
+      if (accountDialog.open) showAccountDialog();
+      return;
+    }
+    if (pending?.email?.toLowerCase() === currentUser.email?.toLowerCase()) {
+      if (isCompletingSignIn) return;
+      isCompletingSignIn = true;
+      try {
+        localStorage.setItem(`${CART_PROFILE_PREFIX}${encodeURIComponent(currentUser.id)}`, JSON.stringify({
+          firstName: pending.firstName,
+          lastName: pending.lastName
+        }));
+        if (pending.productId) addToCart(currentUser.id, pending.productId);
+        localStorage.removeItem(PENDING_AUTH_KEY);
+        accountDialog.close();
+        showCartDialog();
+      } catch (error) {
+        console.error('No se pudo restaurar la cesta después del inicio de sesión:', error);
+        setAccountMessage(error.message || 'No se pudo recuperar la cesta. Inténtalo de nuevo.', 'error');
+        return;
+      } finally {
+        isCompletingSignIn = false;
+      }
     }
   }
 
-  function setSessionUser(user) {
-    currentSession = user ? { user } : null;
-    if (!emailInput || !user) return;
-    emailInput.value = user.email || '';
-    emailInput.readOnly = true;
-    if (submitBtn) submitBtn.textContent = 'Confirmar mi interés';
+  function openAccountForAdd(productId) {
+    if (!supabase) {
+      showAccountDialog();
+      setAccountMessage('El inicio de sesión no está configurado. No se puede guardar tu cesta ahora.', 'error');
+      return;
+    }
+
+    if (currentUser) {
+      try {
+        addToCart(currentUser.id, productId);
+        showCartDialog();
+      } catch (error) {
+        showAccountDialog();
+        setAccountMessage(error.message, 'error');
+      }
+      return;
+    }
+
+    try {
+      localStorage.setItem(PENDING_AUTH_KEY, JSON.stringify({ productId }));
+      showAccountDialog();
+    } catch (error) {
+      showAccountDialog();
+      setAccountMessage(error.message || 'No se pudo guardar el diseño. Revisa el almacenamiento del navegador.', 'error');
+    }
   }
 
-  stepTabs.forEach((tab) => {
+  document.getElementById('cart-button').addEventListener('click', showCartDialog);
+  document.getElementById('account-button').addEventListener('click', showAccountDialog);
+  document.getElementById('mobile-account-button').addEventListener('click', () => {
+    document.getElementById('mobile-nav').classList.add('hidden');
+    showAccountDialog();
+  });
+  cartDialog.querySelectorAll('[data-close-cart]').forEach((button) => button.addEventListener('click', () => cartDialog.close()));
+  document.getElementById('cart-back').addEventListener('click', showCartDialog);
+  cartCheckout.addEventListener('click', () => {
+    if (!currentUser) {
+      cartDialog.close();
+      showAccountDialog();
+      return;
+    }
+    const items = getCartSummary();
+    if (!items.length) return;
+    renderOrderReview();
+  });
+
+  document.getElementById('cart-confirm').addEventListener('click', async () => {
+    if (!currentUser || isSubmittingOrder) return;
+    if (!supabase) {
+      cartError.textContent = 'El registro de solicitudes no está disponible ahora. Inténtalo más tarde.';
+      cartError.classList.remove('hidden');
+      return;
+    }
+    const nombre = cartFirstName.value.trim();
+    const apellidos = cartLastName.value.trim();
+    const items = getCartSummary();
+    if (!nombre || !apellidos || !items.length) {
+      cartError.textContent = 'Añade tu nombre y apellidos y revisa que tu cesta tenga algún diseño.';
+      cartError.classList.remove('hidden');
+      return;
+    }
+
+    isSubmittingOrder = true;
+    const confirmButton = document.getElementById('cart-confirm');
+    confirmButton.disabled = true;
+    confirmButton.textContent = 'Guardando solicitud...';
+    try {
+      const result = await registrarPedidos(items.map(({ product, quantity }) => ({
+        userId: currentUser.id,
+        nombre,
+        apellidos,
+        email: currentUser.email,
+        modelo: quantity > 1 ? `${product.name} × ${quantity}` : product.name,
+        tags: product.tags,
+        estado: 'interesado_7_dias'
+      })));
+      if (!result.success) throw new Error(result.error || 'No se pudo registrar la solicitud.');
+      clearCart(currentUser.id);
+      cartReviewView.hidden = true;
+      cartReviewView.classList.add('hidden');
+      cartReviewFooter.hidden = true;
+      cartReviewFooter.classList.add('hidden');
+      cartItemsView.hidden = false;
+      cartItemsView.classList.remove('hidden');
+      cartFooter.hidden = true;
+      cartFooter.classList.add('hidden');
+      cartSuccess.classList.remove('hidden');
+      cartSuccess.classList.add('block');
+      cartItems.replaceChildren();
+      cartEmpty.classList.add('hidden');
+      cartSubtitle.textContent = 'Solicitud registrada · sin cobro hoy';
+      updateCartBadge();
+    } catch (error) {
+      console.error('Error al confirmar la solicitud de la cesta:', error);
+      cartError.textContent = error.message || 'No se pudo registrar la solicitud. Inténtalo de nuevo.';
+      cartError.classList.remove('hidden');
+    } finally {
+      isSubmittingOrder = false;
+      confirmButton.disabled = false;
+      confirmButton.textContent = 'Confirmar solicitud';
+    }
+  });
+
+  accountForm.querySelectorAll('[data-checkout-step]').forEach((tab) => {
     tab.addEventListener('click', () => {
       const step = Number(tab.dataset.checkoutStep);
-      if (step <= maxVisitedStep) updateCheckoutStep(step);
-    });
-    tab.addEventListener('keydown', (event) => {
-      if (event.key !== 'ArrowLeft' && event.key !== 'ArrowRight') return;
-      event.preventDefault();
-      const availableTabs = stepTabs.filter((stepTab) => Number(stepTab.dataset.checkoutStep) <= maxVisitedStep);
-      const currentIndex = availableTabs.indexOf(tab);
-      const direction = event.key === 'ArrowRight' ? 1 : -1;
-      const nextTab = availableTabs[(currentIndex + direction + availableTabs.length) % availableTabs.length];
-      updateCheckoutStep(Number(nextTab.dataset.checkoutStep));
-      nextTab.focus();
+      if (step <= maxAccountStep) setAccountStep(step);
     });
   });
-
-  dialog.querySelectorAll('[data-step-next]').forEach((button) => {
+  accountForm.querySelectorAll('[data-step-next]').forEach((button) => {
     button.addEventListener('click', () => {
-      if (currentStep === 2) {
-        const missingName = [firstNameInput, lastNameInput].find((input) => !input.value.trim());
-        if (missingName) {
-          showError('Escribe tu nombre y apellidos para continuar.');
-          missingName.focus();
-          return;
-        }
-      }
-
-      const nextStep = Number(button.dataset.stepNext);
-      maxVisitedStep = Math.max(maxVisitedStep, nextStep);
-      if (modalErrorMsg) modalErrorMsg.classList.add('hidden');
-      updateCheckoutStep(nextStep);
-      if (nextStep === 2) firstNameInput?.focus();
-      if (nextStep === 3) emailInput?.focus();
-    });
-  });
-
-  dialog.querySelectorAll('[data-step-back]').forEach((button) => {
-    button.addEventListener('click', () => updateCheckoutStep(Number(button.dataset.stepBack)));
-  });
-
-  if (reservationForm) {
-    reservationForm.addEventListener('submit', async (event) => {
-      event.preventDefault();
-      const missingName = [firstNameInput, lastNameInput].find((input) => !input.value.trim());
-      if (missingName) {
-        updateCheckoutStep(2);
-        showError('Escribe tu nombre y apellidos para continuar.');
-        missingName.focus();
-        return;
-      }
-
-      if (!emailInput.checkValidity()) {
-        updateCheckoutStep(3);
-        showError('Introduce un correo electrónico válido para continuar.');
-        emailInput.focus();
+      if (accountStep === 1 && !emailInput.checkValidity()) {
         emailInput.reportValidity();
         return;
       }
-
-      if (!supabase) {
-        showError('El registro no está disponible ahora. Inténtalo más tarde.');
+      if (accountStep === 2 && (!firstNameInput.value.trim() || !lastNameInput.value.trim())) {
+        setAccountMessage('Escribe tu nombre y apellidos para continuar.', 'error');
         return;
       }
-
-      const firstName = firstNameInput.value.trim();
-      const lastName = lastNameInput.value.trim();
-      const email = emailInput.value.trim().toLowerCase();
-      if (!firstName || !lastName || !email) {
-        showError('Completa tu nombre, apellidos y correo electrónico.');
-        return;
-      }
-
-      if (currentSession?.user.email?.toLowerCase() !== email && currentSession) {
-        showError('El correo debe coincidir con la sesión iniciada.');
-        return;
-      }
-
-      const pending = {
-        firstName,
-        lastName,
-        email,
-        productId: activeModel.id
-      };
-
-      try {
-        localStorage.setItem(PENDING_ORDER_KEY, JSON.stringify(pending));
-      } catch {
-        showError('No se pudo guardar temporalmente la solicitud. Revisa la configuración del navegador.');
-        return;
-      }
-
-      if (currentSession?.user) {
-        await processPendingOrder(currentSession.user);
-        return;
-      }
-
-      if (submitBtn) {
-        submitBtn.disabled = true;
-        submitBtn.textContent = 'Enviando enlace...';
-      }
-      try {
-        const { error } = await supabase.auth.signInWithOtp({
-          email,
-          options: {
-            shouldCreateUser: true,
-            data: { nombre: firstName, apellidos: lastName },
-            emailRedirectTo: `${window.location.origin}${window.location.pathname}`
-          }
-        });
-        if (error) throw error;
-        showInfo('Te hemos enviado un enlace. Ábrelo en este mismo navegador para confirmar tu registro y guardar la solicitud.');
-      } catch (err) {
-        localStorage.removeItem(PENDING_ORDER_KEY);
-        showError(err.message || 'No se pudo enviar el enlace. Comprueba el correo e inténtalo de nuevo.');
-      } finally {
-        if (submitBtn) {
-          submitBtn.disabled = false;
-          submitBtn.textContent = currentSession?.user ? 'Confirmar mi interés' : 'Enviarme el enlace seguro';
-        }
-      }
+      maxAccountStep = Math.max(maxAccountStep, Number(button.dataset.stepNext));
+      accountReviewEmail.textContent = emailInput.value.trim();
+      setAccountStep(Number(button.dataset.stepNext));
     });
-  }
-
-  // Cerrar modal
-  if (closeBtn) {
-    closeBtn.addEventListener('click', () => dialog.close());
-  }
-
-  if (successDoneBtn) {
-    successDoneBtn.addEventListener('click', () => dialog.close());
-  }
-
-  // Light dismiss conforme a la guía de Modern Web Guidance para <dialog>
-  // Detecta clics en el backdrop calculando las coordenadas del bounding rect
-  const isOutside = (e, d) => {
-    const r = d.getBoundingClientRect();
-    return e.clientX < r.left || e.clientX > r.right || e.clientY < r.top || e.clientY > r.bottom;
-  };
-
-  let pressedOutside = false;
-  dialog.addEventListener('pointerdown', (e) => {
-    pressedOutside = isOutside(e, dialog);
   });
-  dialog.addEventListener('pointerup', (e) => {
-    if (pressedOutside && isOutside(e, dialog)) {
-      dialog.close();
-    }
+  accountForm.querySelectorAll('[data-step-back]').forEach((button) => {
+    button.addEventListener('click', () => setAccountStep(Number(button.dataset.stepBack)));
   });
 
-  window.openCheckoutModal = function (productId) {
-    if (productId) {
-      updateSelectedModel(productId);
+  accountForm.addEventListener('submit', async (event) => {
+    event.preventDefault();
+    if (!supabase) {
+      setAccountMessage('El inicio de sesión no está configurado ahora. Inténtalo más tarde.', 'error');
+      return;
     }
-    if (checkoutView) checkoutView.classList.remove('hidden');
-    if (successView) successView.classList.add('hidden');
-    if (modalErrorMsg) modalErrorMsg.classList.add('hidden');
-    if (modalInfoMsg) modalInfoMsg.classList.add('hidden');
-
-    currentStep = 1;
-    maxVisitedStep = 1;
-    updateCheckoutStep(1);
-    dialog.showModal();
-    setTimeout(() => modelSelect?.focus(), 50);
-
-    if (currentSession?.user) {
-      setSessionUser(currentSession.user);
-    } else {
-      if (emailInput) emailInput.readOnly = false;
-      if (submitBtn) submitBtn.textContent = 'Enviarme el enlace seguro';
+    if (isSendingLink) return;
+    const email = emailInput.value.trim().toLowerCase();
+    const firstName = firstNameInput.value.trim();
+    const lastName = lastNameInput.value.trim();
+    if (!emailInput.checkValidity() || !firstName || !lastName) {
+      setAccountMessage('Revisa tu correo, nombre y apellidos antes de continuar.', 'error');
+      return;
     }
-  };
 
+    isSendingLink = true;
+    accountSubmit.disabled = true;
+    accountSubmit.textContent = 'Enviando enlace...';
+    try {
+      const pending = getPendingAuth() || {};
+      localStorage.setItem(PENDING_AUTH_KEY, JSON.stringify({ ...pending, firstName, lastName, email }));
+      const { error } = await supabase.auth.signInWithOtp({
+        email,
+        options: {
+          shouldCreateUser: true,
+          data: { nombre: firstName, apellidos: lastName },
+          emailRedirectTo: `${window.location.origin}${window.location.pathname}`
+        }
+      });
+      if (error) throw error;
+      setAccountMessage('Enlace enviado. Ábrelo en este mismo navegador para iniciar sesión y guardar tu cesta.', 'info');
+    } catch (error) {
+      console.error('No se pudo enviar el enlace de acceso:', error);
+      setAccountMessage(error.message || 'No se pudo enviar el enlace. Comprueba el correo e inténtalo de nuevo.', 'error');
+    } finally {
+      isSendingLink = false;
+      accountSubmit.disabled = false;
+      accountSubmit.textContent = 'Enviarme el enlace';
+    }
+  });
+
+  signOutButton.addEventListener('click', async () => {
+    if (!supabase) return;
+    const { error } = await supabase.auth.signOut();
+    if (error) {
+      setAccountMessage(error.message || 'No se pudo cerrar sesión.', 'error');
+      return;
+    }
+    currentUser = null;
+    accountDialog.close();
+    updateCartBadge();
+  });
+
+  accountDialog.querySelector('#modal-close-btn').addEventListener('click', () => accountDialog.close());
+  accountDialog.addEventListener('click', (event) => {
+    if (event.target === accountDialog) accountDialog.close();
+  });
+  cartDialog.addEventListener('click', (event) => {
+    if (event.target === cartDialog) cartDialog.close();
+  });
+  window.addToCart = openAccountForAdd;
+  window.openCheckoutModal = openAccountForAdd;
+  window.openCart = showCartDialog;
+  window.addEventListener('targetsticker:cart-updated', (event) => {
+    if (event.detail.userId === currentUser?.id) updateCartBadge();
+  });
+
+  updateCartBadge();
   if (supabase) {
     supabase.auth.onAuthStateChange((_event, session) => {
-      currentSession = session;
-      if (session?.user) {
-        setSessionUser(session.user);
-        setTimeout(() => processPendingOrder(session.user), 0);
-      }
+      void completeSignIn(session);
     });
-
     supabase.auth.getSession().then(({ data, error }) => {
-      if (error) return;
-      currentSession = data.session;
-      if (data.session?.user) {
-        setSessionUser(data.session.user);
-        void processPendingOrder(data.session.user);
+      if (error) {
+        console.error('No se pudo recuperar la sesión:', error);
+        return;
       }
+      currentUser = data.session?.user || null;
+      updateCartBadge();
+      if (currentUser && getPendingAuth()) void completeSignIn(data.session);
     });
   }
 }

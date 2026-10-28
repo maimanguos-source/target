@@ -81,3 +81,30 @@ export async function registrarPedido({ userId, nombre, apellidos, email, modelo
   return { success: false, error: 'Supabase no está configurado.' };
 }
 
+export async function registrarPedidos(pedidos) {
+  if (!supabase) return { success: false, error: 'Supabase no está configurado.' };
+
+  const payload = pedidos.map(({ userId, nombre, apellidos, email, modelo, tags = [], estado = 'interesado_7_dias' }) => ({
+    user_id: userId,
+    nombre: nombre.trim(),
+    apellidos: apellidos.trim(),
+    email: email.trim().toLowerCase(),
+    modelo: modelo.trim(),
+    tags,
+    estado: estado.trim()
+  }));
+  if (!payload.length) return { success: false, error: 'La cesta está vacía.' };
+
+  try {
+    const { data, error } = await supabase.from('pedidos').insert(payload).select();
+    if (error) {
+      console.error('[Supabase] Error al guardar los pedidos de la cesta:', error.message, error);
+      return { success: false, error: error.message };
+    }
+
+    return { success: true, data };
+  } catch (networkError) {
+    console.error('[Supabase] Error de red al guardar los pedidos de la cesta:', networkError);
+    return { success: false, error: networkError.message };
+  }
+}

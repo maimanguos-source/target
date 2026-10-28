@@ -166,15 +166,13 @@
           <a href="#faq" class="hover:text-brand-600 transition-colors">Preguntas</a>
         </nav>
 
-        <!-- CTA Header -->
-        <div class="flex items-center gap-3">
-          <button 
-            type="button" 
-            onclick="openCheckoutModal('catalog-001')"
-            class="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-brand-600 text-white font-extrabold text-xs sm:text-sm hover:bg-brand-700 transition-all shadow-md shadow-brand-600/25 active:scale-95 cursor-pointer"
-          >
-            <i data-lucide="sparkles" class="w-4 h-4 text-white"></i>
-            <span>Apuntarme a la hornada</span>
+        <div class="flex items-center gap-2">
+          <button type="button" id="account-button" class="hidden items-center gap-2 rounded-full px-3 py-2 text-xs font-bold text-slate-700 transition-colors hover:bg-slate-100 sm:inline-flex">
+            <i data-lucide="user-round" class="h-4 w-4"></i><span>Mi cuenta</span>
+          </button>
+          <button type="button" id="cart-button" class="relative inline-flex h-11 w-11 items-center justify-center rounded-full border border-slate-200 bg-white text-slate-800 shadow-sm transition hover:border-brand-300 hover:text-brand-700" aria-label="Abrir cesta">
+            <i data-lucide="shopping-bag" class="h-5 w-5"></i>
+            <span id="cart-count" class="cart-count" aria-live="polite">0</span>
           </button>
 
           <!-- Botón Menú Móvil -->
@@ -193,6 +191,7 @@
 
       <!-- Menú Desplegable Móvil -->
       <div id="mobile-nav" class="hidden md:hidden border-b border-slate-200 bg-white px-4 py-4 space-y-3">
+        <button type="button" id="mobile-account-button" class="block w-full py-2 text-left text-sm font-semibold text-slate-700">Iniciar sesión / Mi cuenta</button>
         <a href="#productos" class="block text-sm font-semibold text-slate-700 hover:text-brand-600 py-2">Colección de Diseños</a>
         <a href="#ventajas" class="block text-sm font-semibold text-slate-700 hover:text-brand-600 py-2">Ventajas Técnicas</a>
         <a href="#compatibilidad" class="block text-sm font-semibold text-slate-700 hover:text-brand-600 py-2">Compatibilidad Cajeros & Contactless</a>
@@ -203,7 +202,7 @@
     <main class="flex-1">
       
       <!-- 2. HERO SECTION IMPACTANTE (Fondo Blanco con sutil resplandor azul) -->
-      <section class="relative pt-12 pb-20 md:pt-20 md:pb-28 overflow-hidden bg-gradient-to-b from-blue-50/60 via-white to-white">
+      <section class="relative pt-8 pb-10 md:pt-12 md:pb-14 overflow-hidden bg-gradient-to-b from-blue-50/60 via-white to-white">
         <!-- Resplandor azul suave de fondo -->
         <div class="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[700px] h-[350px] bg-blue-100/60 blur-[130px] rounded-full pointer-events-none"></div>
 
@@ -254,7 +253,7 @@
                   onclick="openCheckoutModal('catalog-001')"
                   class="w-full sm:w-auto px-7 py-4 rounded-2xl bg-white hover:bg-blue-50/60 text-slate-700 hover:text-brand-700 font-bold text-base border border-slate-300 hover:border-brand-300 transition-all flex items-center justify-center gap-2 cursor-pointer shadow-sm"
                 >
-                  <span>Pedir directamente</span>
+                  <span>Añadir diseño al carrito</span>
                   <i data-lucide="arrow-right" class="w-4 h-4 text-brand-600"></i>
                 </button>
               </div>
@@ -294,10 +293,10 @@
       </section>
 
       <!-- 3. SECCIÓN DE PRODUCTOS (GRID BLANCO Y AZUL) -->
-      <section id="productos" class="py-20 md:py-28 bg-slate-50/70 border-y border-slate-200/80 relative">
+      <section id="productos" class="py-10 md:py-14 bg-slate-50/70 border-y border-slate-200/80 relative">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           
-          <div class="text-center max-w-3xl mx-auto mb-16 space-y-4">
+          <div class="text-center max-w-3xl mx-auto mb-8 space-y-3">
             <div class="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-blue-100 text-brand-800 text-xs font-extrabold tracking-wider uppercase border border-blue-200">
               134 modelos disponibles
             </div>
@@ -366,12 +365,25 @@
                 </select>
               </label>
             </div>
+            <div class="mt-4 flex flex-wrap items-center justify-between gap-3 border-t border-slate-100 pt-4">
+              <span class="text-xs font-bold text-slate-500">Vista del catálogo</span>
+              <div class="catalog-view-switch" role="group" aria-label="Vista del catálogo">
+                <button type="button" data-catalog-view="list" aria-pressed="true" class="catalog-view-button is-selected"><i data-lucide="list" class="h-4 w-4"></i><span>Lista</span></button>
+                <button type="button" data-catalog-view="grid" aria-pressed="false" class="catalog-view-button"><i data-lucide="layout-grid" class="h-4 w-4"></i><span>Cuadrícula</span></button>
+                <button type="button" data-catalog-view="photos" aria-pressed="false" class="catalog-view-button"><i data-lucide="images" class="h-4 w-4"></i><span>Solo fotos</span></button>
+              </div>
+            </div>
           </div>
 
           <div id="products-grid" class="catalog-grid" aria-label="Catálogo de modelos">
 
           </div>
-          <nav id="catalog-pagination" class="mt-7 flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-slate-200 bg-white px-4 py-3" aria-label="Paginación del catálogo"></nav>
+          <div class="mt-7 flex flex-col items-center gap-2">
+            <button type="button" id="catalog-load-more" class="rounded-full border border-slate-300 bg-white px-6 py-3 text-sm font-bold text-slate-700 shadow-sm transition hover:border-brand-400 hover:text-brand-700">
+              Ver más diseños
+            </button>
+            <span id="catalog-scroll-status" class="text-xs text-slate-400" aria-live="polite"></span>
+          </div>
 
           <!-- Banner Informativo de Garantía de Calidad (Blanco y Azul) -->
           <div class="mt-16 rounded-3xl bg-white border border-slate-200/90 p-6 md:p-8 flex flex-col md:flex-row items-center justify-between gap-6 shadow-sm">
@@ -490,14 +502,13 @@
               </p>
               
               <div class="pt-2">
-                <button 
-                  type="button" 
-                  onclick="openCheckoutModal('catalog-001')"
-                  class="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-white text-brand-700 font-extrabold text-sm hover:bg-blue-50 transition-all shadow-md active:scale-95 cursor-pointer"
+                <a
+                  href="#productos"
+                  class="inline-flex items-center gap-2 rounded-xl bg-white px-6 py-3 text-sm font-extrabold text-brand-700 shadow-md transition-all hover:bg-blue-50 active:scale-95"
                 >
                   <i data-lucide="sparkles" class="w-4 h-4 text-brand-600"></i>
                   <span>Ver diseños desde 7,99€</span>
-                </button>
+                </a>
               </div>
             </div>
 
@@ -590,191 +601,103 @@
       </div>
     </footer>
 
-    <!-- ========================================== -->
-    <!-- MODAL LIMPIO DE CHECKOUT & VALIDACIÓN      -->
-    <!-- Native HTML5 <dialog> (Blanco y Azul)      -->
-    <!-- ========================================== -->
-    <dialog 
-      id="checkout-modal" 
-      aria-labelledby="modal-heading"
-      class="rounded-3xl bg-white border border-slate-200 text-slate-900 p-0 shadow-2xl max-w-lg w-[92vw] overflow-hidden m-auto"
-    >
-      <!-- Cabecera del Modal -->
-      <div class="p-6 border-b border-slate-200 flex items-center justify-between bg-slate-50">
-        <div class="flex items-center gap-2.5">
-          <div class="w-9 h-9 rounded-xl bg-blue-100 text-brand-600 flex items-center justify-center">
-            <i data-lucide="shopping-bag" class="w-4 h-4"></i>
-          </div>
-          <div>
-            <h3 id="modal-heading" class="text-base font-bold text-slate-900 leading-tight">
-              Apuntarme a la próxima hornada
-            </h3>
-            <span class="text-xs text-brand-600 font-semibold">Sin pago ahora · te avisamos en 7 días</span>
-          </div>
+    <dialog id="cart-dialog" aria-labelledby="cart-heading" class="cart-dialog m-auto overflow-hidden rounded-3xl border border-slate-200 bg-white p-0 text-slate-900 shadow-2xl">
+      <header class="flex items-center justify-between border-b border-slate-200 bg-white p-5">
+        <div>
+          <h2 id="cart-heading" class="text-lg font-black text-slate-900">Tu cesta</h2>
+          <p id="cart-subtitle" class="mt-1 text-xs text-slate-500">Revisa tus diseños antes de continuar</p>
         </div>
-
-        <button 
-          type="button" 
-          id="modal-close-btn" 
-          class="p-2 rounded-xl text-slate-400 hover:text-slate-700 hover:bg-slate-200 transition-colors focus:outline-none cursor-pointer"
-          aria-label="Cerrar ventana"
-        >
-          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
-          </svg>
-        </button>
+        <button type="button" data-close-cart class="rounded-full p-2 text-slate-500 hover:bg-slate-100" aria-label="Cerrar cesta"><i data-lucide="x" class="h-5 w-5"></i></button>
+      </header>
+      <div id="cart-items-view" class="max-h-[70vh] overflow-y-auto p-5">
+        <div id="cart-success" class="hidden rounded-2xl border border-emerald-200 bg-emerald-50 p-5 text-center" role="status">
+          <i data-lucide="check-circle-2" class="mx-auto h-9 w-9 text-emerald-600"></i>
+          <p class="mt-2 font-extrabold text-emerald-900">Solicitud guardada</p>
+          <p class="mt-1 text-sm text-emerald-800">Te avisaremos en 7 días. No se ha realizado ningún cobro.</p>
+        </div>
+        <div id="cart-items" class="space-y-3"></div>
+        <div id="cart-empty" class="hidden py-12 text-center">
+          <i data-lucide="shopping-bag" class="mx-auto h-10 w-10 text-slate-300"></i>
+          <p class="mt-3 font-bold text-slate-800">Tu cesta está vacía</p>
+          <p class="mt-1 text-sm text-slate-500">Añade tus diseños favoritos y aparecerán aquí.</p>
+          <button type="button" data-close-cart class="mt-5 rounded-xl bg-brand-600 px-5 py-3 text-sm font-bold text-white">Seguir comprando</button>
+        </div>
       </div>
+      <div id="cart-review-view" class="hidden max-h-[70vh] space-y-4 overflow-y-auto p-5" hidden>
+        <div class="rounded-2xl border border-emerald-200 bg-emerald-50 p-4">
+          <p class="font-extrabold text-emerald-900">Tu solicitud se tramitará en 7 días</p>
+          <p class="mt-1 text-xs leading-relaxed text-emerald-800">Hoy no se realizará ningún cobro. Esto registra tu interés; no es una compra confirmada. Te contactaremos cuando la próxima hornada esté lista.</p>
+        </div>
+        <div id="cart-review-items" class="space-y-2"></div>
+        <div class="flex items-center justify-between border-t border-slate-200 pt-3 text-sm font-extrabold"><span>Total orientativo · envío gratis</span><span id="cart-review-total"></span></div>
+        <div class="grid grid-cols-1 gap-3 sm:grid-cols-2">
+          <label class="text-xs font-bold text-slate-700">Nombre *
+            <input id="cart-first-name" autocomplete="given-name" class="mt-1.5 w-full rounded-xl border border-slate-300 px-3 py-2.5 text-sm font-normal" required />
+          </label>
+          <label class="text-xs font-bold text-slate-700">Apellidos *
+            <input id="cart-last-name" autocomplete="family-name" class="mt-1.5 w-full rounded-xl border border-slate-300 px-3 py-2.5 text-sm font-normal" required />
+          </label>
+        </div>
+        <p id="cart-error" class="hidden rounded-xl bg-rose-50 p-3 text-xs text-rose-700" role="alert"></p>
+      </div>
+      <footer id="cart-footer" class="flex items-center justify-between gap-4 border-t border-slate-200 bg-slate-50 p-5">
+        <div><span class="block text-[10px] font-bold uppercase tracking-wide text-slate-500">Total · envío gratis</span><strong id="cart-total" class="text-lg font-black text-slate-900"></strong></div>
+        <button type="button" id="cart-checkout" class="rounded-xl bg-brand-600 px-5 py-3 text-sm font-extrabold text-white transition hover:bg-brand-700">Tramitar pedido</button>
+      </footer>
+      <footer id="cart-review-footer" class="hidden items-center justify-between gap-3 border-t border-slate-200 bg-slate-50 p-5" hidden>
+        <button type="button" id="cart-back" class="rounded-xl border border-slate-300 px-4 py-3 text-sm font-bold text-slate-700">Volver a la cesta</button>
+        <button type="button" id="cart-confirm" class="rounded-xl bg-brand-600 px-5 py-3 text-sm font-extrabold text-white transition hover:bg-brand-700">Confirmar solicitud</button>
+      </footer>
+    </dialog>
 
-      <div id="modal-checkout-view" class="max-h-[82vh] overflow-y-auto p-5 sm:p-6">
-        <form id="reservation-form" class="space-y-5" novalidate>
-          <div class="checkout-steps" role="tablist" aria-label="Pasos para solicitar el diseño">
-            <button type="button" class="checkout-step is-active" role="tab" id="checkout-tab-1" aria-controls="checkout-panel-1" aria-selected="true" data-checkout-step="1">
-              <span class="checkout-step-number">1</span><span>Diseño</span>
-            </button>
-            <button type="button" class="checkout-step" role="tab" id="checkout-tab-2" aria-controls="checkout-panel-2" aria-selected="false" tabindex="-1" data-checkout-step="2">
-              <span class="checkout-step-number">2</span><span>Tus datos</span>
-            </button>
-            <button type="button" class="checkout-step" role="tab" id="checkout-tab-3" aria-controls="checkout-panel-3" aria-selected="false" tabindex="-1" data-checkout-step="3">
-              <span class="checkout-step-number">3</span><span>Acceso</span>
-            </button>
+    <dialog id="checkout-modal" aria-labelledby="modal-heading" class="m-auto w-[92vw] max-w-lg overflow-hidden rounded-3xl border border-slate-200 bg-white p-0 text-slate-900 shadow-2xl">
+      <header class="flex items-center justify-between border-b border-slate-200 bg-slate-50 p-5">
+        <div>
+          <h2 id="modal-heading" class="text-base font-black text-slate-900">Inicia sesión para añadir a la cesta</h2>
+          <p class="mt-1 text-xs font-semibold text-brand-700">Acceso seguro mediante enlace por correo</p>
+        </div>
+        <button type="button" id="modal-close-btn" class="rounded-full p-2 text-slate-500 hover:bg-slate-200" aria-label="Cerrar"><i data-lucide="x" class="h-5 w-5"></i></button>
+      </header>
+      <div class="p-5 sm:p-6">
+        <div id="account-signed-in" class="hidden space-y-4" hidden>
+          <div class="rounded-2xl bg-emerald-50 p-4">
+            <p class="font-extrabold text-emerald-900">Ya has iniciado sesión</p>
+            <p id="account-signed-in-email" class="mt-1 break-all text-sm text-emerald-800"></p>
           </div>
-
+          <button type="button" id="account-sign-out" class="w-full rounded-xl border border-slate-300 px-4 py-3 text-sm font-bold text-slate-700 hover:bg-slate-50">Cerrar sesión</button>
+        </div>
+        <form id="reservation-form" class="space-y-5" novalidate>
+          <div class="checkout-steps" role="tablist" aria-label="Pasos de acceso">
+            <button type="button" class="checkout-step is-active" role="tab" id="checkout-tab-1" aria-controls="checkout-panel-1" aria-selected="true" data-checkout-step="1"><span class="checkout-step-number">1</span><span>Correo</span></button>
+            <button type="button" class="checkout-step" role="tab" id="checkout-tab-2" aria-controls="checkout-panel-2" aria-selected="false" tabindex="-1" data-checkout-step="2"><span class="checkout-step-number">2</span><span>Tus datos</span></button>
+            <button type="button" class="checkout-step" role="tab" id="checkout-tab-3" aria-controls="checkout-panel-3" aria-selected="false" tabindex="-1" data-checkout-step="3"><span class="checkout-step-number">3</span><span>Verificar</span></button>
+          </div>
           <div id="modal-info-message" class="hidden rounded-xl border border-blue-200 bg-blue-50 p-3 text-xs text-blue-800" role="status" aria-live="polite"></div>
           <div id="modal-error-message" class="hidden rounded-xl border border-rose-200 bg-rose-50 p-3 text-xs text-rose-700" role="alert"></div>
-
-          <section id="checkout-panel-1" class="checkout-panel space-y-4" role="tabpanel" aria-labelledby="checkout-tab-1" data-checkout-panel="1">
-            <div>
-              <h4 class="text-base font-extrabold text-slate-900">Tu diseño favorito</h4>
-              <p class="mt-1 text-xs text-slate-500">Revisa el modelo antes de continuar.</p>
-            </div>
-            <div class="overflow-hidden rounded-2xl border border-slate-200 bg-white">
-              <div class="flex items-center gap-4 p-4">
-                <div class="h-20 w-24 shrink-0 overflow-hidden rounded-xl bg-slate-50 p-1">
-                  <img id="modal-selected-img" src="/products/catalog-001.webp" alt="Modelo seleccionado" class="h-full w-full object-contain" />
-                </div>
-                <div class="min-w-0 flex-1">
-                  <span class="text-[10px] font-bold uppercase tracking-wider text-brand-600">Modelo elegido</span>
-                  <h4 id="modal-selected-name" class="mt-1 text-sm font-bold leading-snug text-slate-900">Pegatinas Papel Roto para Tarjetas de Crédito - Modelo z1</h4>
-                  <span id="modal-selected-price" class="mt-1 block text-sm font-extrabold text-slate-800">9,99 € · Envío gratis</span>
-                </div>
-              </div>
-              <div class="border-t border-slate-100 bg-slate-50 px-4 py-3">
-                <label for="checkout-model-select" class="mb-1.5 block text-[10px] font-bold uppercase tracking-wider text-slate-600">Cambiar diseño</label>
-                <select id="checkout-model-select" class="w-full rounded-xl border border-slate-300 bg-white px-3 py-2.5 text-xs text-slate-900 focus:border-brand-600 focus:outline-none focus:ring-1 focus:ring-brand-600"></select>
-              </div>
-            </div>
-            <div class="flex items-center justify-between rounded-xl bg-emerald-50 px-4 py-3 text-xs">
-              <span class="font-bold text-emerald-800">Envío</span><span class="font-extrabold text-emerald-800">Gratis</span>
-            </div>
-            <button type="button" data-step-next="2" class="w-full rounded-xl bg-brand-600 px-4 py-3.5 text-sm font-extrabold text-white transition-colors hover:bg-brand-700">
-              Continuar con mis datos <i data-lucide="arrow-right" class="ml-1 inline h-4 w-4"></i>
-            </button>
-          </section>
-
-          <section id="checkout-panel-2" class="checkout-panel hidden space-y-4" role="tabpanel" aria-labelledby="checkout-tab-2" data-checkout-panel="2" hidden>
-            <div>
-              <h4 class="text-base font-extrabold text-slate-900">¿A nombre de quién lo guardamos?</h4>
-              <p class="mt-1 text-xs text-slate-500">Usaremos estos datos para identificar tu solicitud.</p>
-            </div>
-            <div class="grid grid-cols-1 gap-3 sm:grid-cols-2">
-              <label class="space-y-1.5 text-xs font-bold text-slate-700" for="checkout-first-name">
-                Nombre *
-                <input id="checkout-first-name" name="given-name" type="text" autocomplete="given-name" required placeholder="Tu nombre" class="w-full rounded-xl border border-slate-300 bg-white px-4 py-3 text-sm font-normal text-slate-900 placeholder:text-slate-400 focus:border-brand-600 focus:outline-none focus:ring-1 focus:ring-brand-600" />
-              </label>
-              <label class="space-y-1.5 text-xs font-bold text-slate-700" for="checkout-last-name">
-                Apellidos *
-                <input id="checkout-last-name" name="family-name" type="text" autocomplete="family-name" required placeholder="Tus apellidos" class="w-full rounded-xl border border-slate-300 bg-white px-4 py-3 text-sm font-normal text-slate-900 placeholder:text-slate-400 focus:border-brand-600 focus:outline-none focus:ring-1 focus:ring-brand-600" />
-              </label>
-            </div>
-            <div class="flex gap-3">
-              <button type="button" data-step-back="1" class="w-1/3 rounded-xl border border-slate-300 px-4 py-3 text-sm font-bold text-slate-700 hover:bg-slate-50">Atrás</button>
-              <button type="button" data-step-next="3" class="flex-1 rounded-xl bg-brand-600 px-4 py-3 text-sm font-extrabold text-white transition-colors hover:bg-brand-700">Continuar al acceso</button>
-            </div>
-          </section>
-
-          <section id="checkout-panel-3" class="checkout-panel hidden space-y-4" role="tabpanel" aria-labelledby="checkout-tab-3" data-checkout-panel="3" hidden>
-            <div>
-              <h4 class="text-base font-extrabold text-slate-900">Accede de forma segura</h4>
-              <p class="mt-1 text-xs text-slate-500">Te enviaremos un enlace por correo; no necesitas crear una contraseña.</p>
-            </div>
-            <label for="checkout-email" class="block space-y-1.5 text-xs font-bold text-slate-700">
-              Correo electrónico *
-              <input id="checkout-email" name="email" type="email" autocomplete="email" required placeholder="ejemplo@correo.com" class="w-full rounded-xl border border-slate-300 bg-white px-4 py-3 text-sm font-normal text-slate-900 placeholder:text-slate-400 focus:border-brand-600 focus:outline-none focus:ring-1 focus:ring-brand-600" />
+          <section id="checkout-panel-1" class="space-y-4" role="tabpanel" aria-labelledby="checkout-tab-1" data-checkout-panel="1">
+            <h3 class="font-extrabold text-slate-900">¿Cuál es tu correo?</h3>
+            <label for="checkout-email" class="block text-xs font-bold text-slate-700">Correo electrónico
+              <input id="checkout-email" type="email" autocomplete="email" required placeholder="tu@correo.com" class="mt-1.5 w-full rounded-xl border border-slate-300 px-4 py-3 text-sm font-normal focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-100" />
             </label>
-            <div class="rounded-xl border border-slate-200 bg-slate-50 p-4 text-xs">
-              <div class="flex justify-between gap-3 text-slate-600"><span>Diseño</span><strong id="checkout-review-name" class="text-right text-slate-900">Modelo elegido</strong></div>
-              <div class="mt-2 flex justify-between text-slate-600"><span>Envío</span><strong class="text-emerald-700">Gratis</strong></div>
-              <div class="mt-3 flex justify-between border-t border-slate-200 pt-3 text-sm font-extrabold text-slate-900"><span>Total orientativo</span><strong id="checkout-review-price">9,99 €</strong></div>
-            </div>
-            <div class="flex gap-3">
-              <button type="button" data-step-back="2" class="w-1/3 rounded-xl border border-slate-300 px-4 py-3 text-sm font-bold text-slate-700 hover:bg-slate-50">Atrás</button>
-              <button type="submit" id="reservation-submit-btn" class="flex-1 rounded-xl bg-brand-600 px-4 py-3 text-sm font-extrabold text-white transition-colors hover:bg-brand-700">
-                Enviarme el enlace seguro
-              </button>
-            </div>
-            <p class="text-center text-[11px] leading-relaxed text-slate-500">
-              Al confirmar registrarás tu interés. No es un pedido confirmado y no se realizará ningún cobro ahora.
-            </p>
+            <button type="button" data-step-next="2" class="w-full rounded-xl bg-brand-600 px-4 py-3 text-sm font-extrabold text-white">Continuar</button>
+          </section>
+          <section id="checkout-panel-2" class="hidden space-y-4" role="tabpanel" aria-labelledby="checkout-tab-2" data-checkout-panel="2" hidden>
+            <h3 class="font-extrabold text-slate-900">Cuéntanos cómo te llamas</h3>
+            <label for="checkout-first-name" class="block text-xs font-bold text-slate-700">Nombre
+              <input id="checkout-first-name" autocomplete="given-name" required class="mt-1.5 w-full rounded-xl border border-slate-300 px-4 py-3 text-sm font-normal" />
+            </label>
+            <label for="checkout-last-name" class="block text-xs font-bold text-slate-700">Apellidos
+              <input id="checkout-last-name" autocomplete="family-name" required class="mt-1.5 w-full rounded-xl border border-slate-300 px-4 py-3 text-sm font-normal" />
+            </label>
+            <div class="flex gap-3"><button type="button" data-step-back="1" class="w-1/3 rounded-xl border border-slate-300 px-4 py-3 text-sm font-bold">Atrás</button><button type="button" data-step-next="3" class="flex-1 rounded-xl bg-brand-600 px-4 py-3 text-sm font-extrabold text-white">Continuar</button></div>
+          </section>
+          <section id="checkout-panel-3" class="hidden space-y-4" role="tabpanel" aria-labelledby="checkout-tab-3" data-checkout-panel="3" hidden>
+            <h3 class="font-extrabold text-slate-900">Confirma tu acceso seguro</h3>
+            <p class="text-sm leading-relaxed text-slate-600">Te enviaremos un enlace de un solo uso a <strong id="account-review-email" class="break-all text-slate-900"></strong>. Al abrirlo iniciaremos sesión y guardaremos tu cesta.</p>
+            <div class="flex gap-3"><button type="button" data-step-back="2" class="w-1/3 rounded-xl border border-slate-300 px-4 py-3 text-sm font-bold">Atrás</button><button type="submit" id="reservation-submit-btn" class="flex-1 rounded-xl bg-brand-600 px-4 py-3 text-sm font-extrabold text-white">Enviarme el enlace</button></div>
           </section>
         </form>
       </div>
-
-      <!-- Confirmación de registro -->
-      <div id="modal-success-view" class="hidden p-6 sm:p-8 space-y-6 text-center bg-white">
-        
-        <!-- Icono Festivo y Mascota -->
-        <div class="relative mx-auto w-20 h-20 flex items-center justify-center">
-          <div class="absolute inset-0 bg-blue-100 blur-xl rounded-full animate-pulse"></div>
-          <div class="relative z-10 w-16 h-16 rounded-full bg-blue-50 border-2 border-brand-600 flex items-center justify-center text-brand-600">
-            <i data-lucide="check-circle-2" class="w-9 h-9"></i>
-          </div>
-        </div>
-
-        <div class="space-y-2">
-          <span class="sticker-badge bg-blue-100 text-brand-800 text-xs font-black">
-            ¡Registro confirmado!
-          </span>
-          <h3 class="text-xl sm:text-2xl font-black font-display text-slate-900">
-            ¡Gracias por apuntarte!
-          </h3>
-        </div>
-
-        <div class="rounded-2xl bg-blue-50 border border-blue-200 p-5 text-left space-y-3">
-          <p class="text-sm text-blue-950 font-medium leading-relaxed">
-            Hemos registrado tu interés en este diseño. Te avisaremos por correo dentro de 7 días con novedades sobre la próxima hornada. Esta solicitud no es un pedido confirmado ni implica ningún pago.
-          </p>
-        </div>
-
-        <!-- Resumen del Registro -->
-        <div class="p-4 rounded-xl bg-slate-50 border border-slate-200 text-left text-xs space-y-2 font-mono">
-          <div class="flex justify-between text-slate-600">
-            <span>Modelo:</span>
-            <span id="success-summary-model" class="font-bold text-slate-900">Cyberpunk Neon</span>
-          </div>
-          <div class="flex justify-between text-slate-600">
-            <span>Email de notificación:</span>
-            <span id="success-summary-email" class="font-bold text-brand-700 break-all">-</span>
-          </div>
-          <div class="flex justify-between text-slate-600">
-            <span>Estado en Base de Datos:</span>
-            <span class="font-bold text-brand-600">interés registrado</span>
-          </div>
-          <div class="flex justify-between text-slate-600">
-            <span>Próximo aviso:</span>
-            <span id="success-batch-date" class="font-bold text-brand-800">-</span>
-          </div>
-        </div>
-
-        <button 
-          type="button" 
-          id="success-done-btn"
-          class="w-full py-3.5 px-6 rounded-2xl bg-brand-600 hover:bg-brand-700 text-white font-extrabold text-sm transition-all cursor-pointer shadow-md shadow-brand-600/25"
-        >
-          Entendido, volver a la tienda
-        </button>
-
-      </div>
-
     </dialog>
 
     <!-- ========================================== -->

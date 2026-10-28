@@ -58,19 +58,214 @@ dialog::backdrop {
 
 .catalog-grid {
   display: grid;
-  grid-template-columns: minmax(0, 1fr);
   gap: 1.25rem;
 }
 
+.catalog-grid.catalog-list {
+  grid-template-columns: minmax(0, 1fr);
+}
+
+.catalog-list .product-card {
+  display: grid;
+  grid-template-columns: minmax(7rem, 0.38fr) minmax(0, 1fr);
+  min-height: 10rem;
+}
+
+.catalog-list .product-card-image {
+  aspect-ratio: auto;
+  min-height: 100%;
+  padding: 0.65rem;
+}
+
+.catalog-list .product-card-details {
+  padding: 0.85rem;
+}
+
+.catalog-list .product-card-details h3 {
+  font-size: 0.8rem;
+}
+
+.catalog-list .product-description,
+.catalog-list .product-tags {
+  display: none;
+}
+
+.catalog-list .product-rating {
+  margin-top: 0.35rem;
+  font-size: 0.65rem;
+}
+
+.catalog-list .product-buy-row {
+  border-top: 0;
+  padding-top: 0.45rem;
+}
+
+.catalog-list .product-total-label {
+  display: none;
+}
+
+.catalog-grid.catalog-grid-view {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.75rem;
+}
+
+.catalog-grid.catalog-grid-view .product-card-details {
+  padding: 0.9rem;
+}
+
+.catalog-grid.catalog-grid-view .product-price {
+  font-size: 0.85rem;
+}
+
+.catalog-grid.catalog-photos {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.5rem;
+}
+
+.catalog-photos .product-card {
+  position: relative;
+  aspect-ratio: 1;
+  border-radius: 0.9rem;
+}
+
+.catalog-photos .product-card-image {
+  height: 100%;
+  padding: 0.3rem;
+}
+
+.catalog-photos .product-card-details,
+.catalog-photos .product-category,
+.catalog-photos .product-shipping {
+  display: none;
+}
+
+.catalog-photos .product-photo-add {
+  position: absolute;
+  right: 0.4rem;
+  bottom: 0.4rem;
+  display: grid;
+  width: 2rem;
+  height: 2rem;
+  place-items: center;
+  border: 0;
+  border-radius: 9999px;
+  background: #2563eb;
+  color: #fff;
+  box-shadow: 0 2px 8px rgb(15 23 42 / 20%);
+}
+
+.product-photo-add {
+  display: none;
+}
+
+.catalog-empty {
+  grid-column: 1 / -1;
+}
+
+.catalog-view-switch {
+  display: inline-flex;
+  gap: 0.25rem;
+  border-radius: 0.9rem;
+  background: #f1f5f9;
+  padding: 0.25rem;
+}
+
+.catalog-view-button {
+  display: inline-flex;
+  min-height: 2.25rem;
+  align-items: center;
+  justify-content: center;
+  gap: 0.35rem;
+  border: 0;
+  border-radius: 0.7rem;
+  background: transparent;
+  padding: 0 0.65rem;
+  color: #64748b;
+  font-size: 0.7rem;
+  font-weight: 700;
+}
+
+.catalog-view-button.is-selected {
+  background: #fff;
+  color: #1d4ed8;
+  box-shadow: 0 1px 3px rgb(15 23 42 / 12%);
+}
+
+.cart-count {
+  position: absolute;
+  top: -0.2rem;
+  right: -0.2rem;
+  display: grid;
+  min-width: 1.2rem;
+  height: 1.2rem;
+  place-items: center;
+  border-radius: 9999px;
+  background: #2563eb;
+  padding: 0 0.25rem;
+  color: white;
+  font-size: 0.65rem;
+  font-weight: 800;
+}
+
+.cart-count.is-empty {
+  background: #94a3b8;
+}
+
+.cart-dialog {
+  width: min(94vw, 36rem);
+  max-height: 90dvh;
+}
+
+.cart-line {
+  display: flex;
+  gap: 0.85rem;
+  border: 1px solid #e2e8f0;
+  border-radius: 1rem;
+  padding: 0.75rem;
+}
+
+.cart-line-image {
+  width: 5rem;
+  height: 5rem;
+  flex: none;
+  border-radius: 0.75rem;
+  background: #f8fafc;
+  object-fit: contain;
+}
+
+.cart-quantity-button {
+  display: grid;
+  width: 1.6rem;
+  height: 1.6rem;
+  place-items: center;
+  border: 1px solid #cbd5e1;
+  border-radius: 0.5rem;
+  background: white;
+  color: #334155;
+  font-size: 0.9rem;
+  line-height: 1;
+}
+
 @media (min-width: 640px) {
-  .catalog-grid {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+  .catalog-grid.catalog-grid-view {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
   }
 }
 
-@media (min-width: 1024px) {
-  .catalog-grid {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
+@media (max-width: 359px) {
+  .catalog-view-button {
+    gap: 0.2rem;
+    padding: 0 0.4rem;
+    font-size: 0.62rem;
+  }
+
+  .catalog-view-button svg {
+    width: 0.85rem;
+    height: 0.85rem;
+  }
+
+  .catalog-list .product-card {
+    grid-template-columns: minmax(6rem, 0.35fr) minmax(0, 1fr);
   }
 }
 
