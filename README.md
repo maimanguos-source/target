@@ -17,13 +17,14 @@ Catálogo de pegatinas de vinilo para tarjetas. Las personas interesadas se regi
      - 🖤 **Black Matte Minimal** (5.99€ · Envío gratis)
    - Fácilmente ampliable: solo añade un nuevo objeto al array `PRODUCTS`.
 3. **Registro de interés**:
-   - El modal `<dialog>` solicita correo dos veces, nombre, apellidos y contraseña.
-   - Supabase Auth crea la cuenta con correo y contraseña; la solicitud solo se registra después de iniciar sesión.
+   - El modal `<dialog>` permite iniciar sesión o crear una cuenta con correo y contraseña.
+   - Supabase Auth crea y recuerda las cuentas; el nombre y los apellidos se guardan en los metadatos del usuario.
+   - La solicitud solo se registra después de iniciar sesión.
    - No se procesa ningún pago en esta fase.
    - La pantalla de confirmación informa del aviso previsto en 7 días.
    - El buscador del catálogo filtra por texto y por etiquetas configuradas en cada diseño.
 4. **Persistencia en Supabase**:
-   - Se guarda cada interés confirmado en `pedidos`, asociado a `user_id`.
+   - Se guarda cada interés confirmado en `pedidos`, asociado a `user_id`; la sesión persistente se gestiona con Supabase Auth.
    - Campos: nombre, apellidos, correo, modelo, estado y etiquetas.
    - RLS permite insertar y consultar únicamente los registros del usuario autenticado.
 
@@ -43,8 +44,8 @@ Catálogo de pegatinas de vinilo para tarjetas. Las personas interesadas se regi
 1. Crea un proyecto gratuito en [Supabase](https://supabase.com).
 2. Ve a la sección **SQL Editor** en el menú lateral.
 3. Copia y pega el contenido del archivo [`supabase_schema.sql`](./supabase_schema.sql) y pulsa **Run**.
-4. En **Authentication > URL Configuration**, configura el **Site URL** y añade a **Redirect URLs** los orígenes permitidos, por ejemplo `http://localhost:5173/**` y el dominio de producción de Vercel. Para esta versión no se usa verificación por enlace mágico; la cuenta se crea con correo y contraseña.
-5. Obtén la **Project URL** y la **publishable key** desde **Project Settings > API**. La clave secreta no se debe usar en el navegador.
+4. En **Authentication > URL Configuration**, configura el **Site URL** y añade a **Redirect URLs** los orígenes permitidos, por ejemplo `http://localhost:3000/**` y el dominio de producción de Vercel. Las personas pueden crear una cuenta e iniciar sesión con correo y contraseña.
+5. Obtén la **Project URL** y la **publishable key** desde **Project Settings > API**. La clave secreta no se debe usar en el navegador. Copia `.env.example` a `.env.local` para el desarrollo local; en Vercel configura las mismas dos variables.
 
 ---
 
@@ -58,7 +59,7 @@ VITE_SUPABASE_URL="https://tu-proyecto.supabase.co"
 VITE_SUPABASE_ANON_KEY="tu-publishable-key"
 ```
 
-No pongas `SUPABASE_SECRET_KEY` en ninguna variable `VITE_`: Vite las expone al navegador. Si Supabase no está configurado, el formulario no registra solicitudes.
+No pongas `SUPABASE_SECRET_KEY`, `service_role` ni ninguna clave secreta en variables `VITE_`: Vite las expone al navegador. Solo usa la clave publishable/anon. Si Supabase no está configurado, el formulario no permite iniciar sesión ni registrar solicitudes.
 
 ---
 
@@ -134,4 +135,3 @@ Para agregar más modelos en el futuro, abre [`src/products.js`](./src/products.
 ```
 
 El nuevo producto aparecerá automáticamente en el Grid de la tienda, en el selector del modal y en el menú de compra.
-

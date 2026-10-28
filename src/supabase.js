@@ -1,6 +1,6 @@
 import { createClient } from '@supabase/supabase-js';
 
-// Variables de entorno cargadas por Vite / Vercel
+// Variables públicas de Supabase cargadas por Vite / Vercel.
 const supabaseUrl = import.meta.env.VITE_SUPABASE_URL || '';
 const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY || '';
 

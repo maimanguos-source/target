@@ -22,6 +22,13 @@ export function initCheckoutModal() {
   if (!accountDialog || !cartDialog) return;
 
   const accountForm = document.getElementById('reservation-form');
+  const loginForm = document.getElementById('login-form');
+  const accountAccess = document.getElementById('account-access');
+  const loginTab = document.getElementById('account-login-tab');
+  const signupTab = document.getElementById('account-signup-tab');
+  const loginEmailInput = document.getElementById('login-email');
+  const loginPasswordInput = document.getElementById('login-password');
+  const loginSubmit = document.getElementById('login-submit-btn');
   const accountSubmit = document.getElementById('reservation-submit-btn');
   const emailInput = document.getElementById('checkout-email');
   const emailConfirmInput = document.getElementById('checkout-email-confirm');
@@ -51,11 +58,12 @@ export function initCheckoutModal() {
   const cartLastName = document.getElementById('cart-last-name');
   const cartCheckout = document.getElementById('cart-checkout');
   let currentUser = null;
-  let isSendingLink = false;
+  let isSubmittingAuth = false;
   let isSubmittingOrder = false;
   let isCompletingSignIn = false;
   let accountStep = 1;
   let maxAccountStep = 1;
+  let accountMode = 'login';
 
   function getPendingAuth() {
     const stored = localStorage.getItem(PENDING_AUTH_KEY);
@@ -67,6 +75,27 @@ export function initCheckoutModal() {
     errorMessage.classList.toggle('hidden', type !== 'error');
     if (type === 'info') infoMessage.textContent = message;
     if (type === 'error') errorMessage.textContent = message;
+  }
+
+  function setAccountMode(mode) {
+    accountMode = mode;
+    const signingIn = mode === 'login';
+    loginForm.hidden = !signingIn;
+    loginForm.classList.toggle('hidden', !signingIn);
+    accountForm.hidden = signingIn;
+    accountForm.classList.toggle('hidden', signingIn);
+    loginTab.setAttribute('aria-selected', String(signingIn));
+    signupTab.setAttribute('aria-selected', String(!signingIn));
+    loginTab.classList.toggle('bg-brand-600', signingIn);
+    loginTab.classList.toggle('text-white', signingIn);
+    loginTab.classList.toggle('border', !signingIn);
+    loginTab.classList.toggle('border-slate-300', !signingIn);
+    loginTab.classList.toggle('text-slate-700', !signingIn);
+    signupTab.classList.toggle('bg-brand-600', !signingIn);
+    signupTab.classList.toggle('text-white', !signingIn);
+    signupTab.classList.toggle('border', signingIn);
+    signupTab.classList.toggle('border-slate-300', signingIn);
+    signupTab.classList.toggle('text-slate-700', signingIn);
   }
 
   function setAccountStep(step) {
@@ -93,14 +122,15 @@ export function initCheckoutModal() {
     if (currentUser) {
       signedInView.hidden = false;
       signedInView.classList.remove('hidden');
-      accountForm.hidden = true;
-      accountForm.classList.add('hidden');
+      accountAccess.hidden = true;
+      accountAccess.classList.add('hidden');
       accountSignedInEmail.textContent = currentUser.email || '';
     } else {
       signedInView.hidden = true;
       signedInView.classList.add('hidden');
-      accountForm.hidden = false;
-      accountForm.classList.remove('hidden');
+      accountAccess.hidden = false;
+      accountAccess.classList.remove('hidden');
+      setAccountMode(accountMode);
       maxAccountStep = 1;
       setAccountStep(1);
     }
@@ -228,10 +258,12 @@ export function initCheckoutModal() {
       if (isCompletingSignIn) return;
       isCompletingSignIn = true;
       try {
-        localStorage.setItem(`${CART_PROFILE_PREFIX}${encodeURIComponent(currentUser.id)}`, JSON.stringify({
-          firstName: pending.firstName,
-          lastName: pending.lastName
-        }));
+        if (pending.firstName || pending.lastName) {
+          localStorage.setItem(`${CART_PROFILE_PREFIX}${encodeURIComponent(currentUser.id)}`, JSON.stringify({
+            firstName: pending.firstName || currentUser.user_metadata?.nombre || '',
+            lastName: pending.lastName || currentUser.user_metadata?.apellidos || ''
+          }));
+        }
         if (pending.productId) addToCart(currentUser.id, pending.productId);
         localStorage.removeItem(PENDING_AUTH_KEY);
         accountDialog.close();
@@ -389,12 +421,12 @@ export function initCheckoutModal() {
       setAccountMessage('El inicio de sesión no está configurado ahora. Inténtalo más tarde.', 'error');
       return;
     }
-    if (isSendingLink) return;
+    if (isSubmittingAuth) return;
     const email = emailInput.value.trim().toLowerCase();
     const repeatedEmail = emailConfirmInput.value.trim().toLowerCase();
     const firstName = firstNameInput.value.trim();
     const lastName = lastNameInput.value.trim();
-    const password = passwordInput.value.trim();
+    const password = passwordInput.value;
 
     if (!emailInput.checkValidity() || !repeatedEmail || email !== repeatedEmail || !firstName || !lastName || !password) {
       setAccountMessage('Revisa tu correo, nombre, apellidos y contraseña antes de continuar.', 'error');
@@ -406,7 +438,7 @@ export function initCheckoutModal() {
       return;
     }
 
-    isSendingLink = true;
+    isSubmittingAuth = true;
     accountSubmit.disabled = true;
     accountSubmit.textContent = 'Creando cuenta...';
     try {
@@ -423,13 +455,15 @@ export function initCheckoutModal() {
       if (data?.session) {
         setAccountMessage('Cuenta creada. Ya puedes seguir con tu cesta.', 'info');
       } else {
-        setAccountMessage('Cuenta creada. Inicia sesión con este correo y la contraseña que has elegido para continuar.', 'info');
+        loginEmailInput.value = email;
+        setAccountMode('login');
+        setAccountMessage('Cuenta creada. Si Supabase te pide confirmar el correo, confírmalo y luego inicia sesión con tu contraseña.', 'info');
       }
     } catch (error) {
       console.error('No se pudo crear la cuenta:', error);
       setAccountMessage(error.message || 'No se pudo crear la cuenta. Comprueba los datos e inténtalo de nuevo.', 'error');
     } finally {
-      isSendingLink = false;
+      isSubmittingAuth = false;
       accountSubmit.disabled = false;
       accountSubmit.textContent = 'Crear cuenta';
     }
@@ -462,6 +496,43 @@ export function initCheckoutModal() {
   });
 
   updateCartBadge();
+  loginTab.addEventListener('click', () => setAccountMode('login'));
+  signupTab.addEventListener('click', () => setAccountMode('signup'));
+  loginForm.addEventListener('submit', async (event) => {
+    event.preventDefault();
+    if (!supabase) {
+      setAccountMessage('El inicio de sesión no está configurado ahora. Inténtalo más tarde.', 'error');
+      return;
+    }
+
+    const email = loginEmailInput.value.trim().toLowerCase();
+    const password = loginPasswordInput.value;
+    if (!loginEmailInput.checkValidity() || !password) {
+      setAccountMessage('Escribe un correo válido y tu contraseña para iniciar sesión.', 'error');
+      return;
+    }
+    if (isSubmittingAuth) return;
+
+    isSubmittingAuth = true;
+    loginSubmit.disabled = true;
+    loginSubmit.textContent = 'Iniciando sesión...';
+    try {
+      const pending = getPendingAuth();
+      if (pending?.productId) {
+        localStorage.setItem(PENDING_AUTH_KEY, JSON.stringify({ ...pending, email }));
+      }
+      const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+      if (error) throw error;
+      await completeSignIn(data.session);
+    } catch (error) {
+      console.error('No se pudo iniciar sesión:', error);
+      setAccountMessage(error.message || 'No se pudo iniciar sesión. Comprueba el correo y la contraseña.', 'error');
+    } finally {
+      isSubmittingAuth = false;
+      loginSubmit.disabled = false;
+      loginSubmit.textContent = 'Iniciar sesión';
+    }
+  });
   if (supabase) {
     supabase.auth.onAuthStateChange((_event, session) => {
       void completeSignIn(session);
