@@ -6,6 +6,7 @@ export const PRODUCTS = [
   {
     id: "cyberpunk-neon",
     name: "Cyberpunk Neon",
+    tags: ["cyberpunk", "neon", "synthwave", "digital", "cian", "magenta"],
     subtitle: "Estética Synthwave & Circuito Digital",
     tagline: "Líneas de neón cian y magenta sobre horizonte cibernético profundo.",
     price: 5.99,
@@ -28,6 +29,7 @@ export const PRODUCTS = [
   {
     id: "retro-wave",
     name: "Retro Wave",
+    tags: ["retro", "80s", "nostalgia", "synthwave", "atardecer", "violeta", "dorado"],
     subtitle: "Atardecer Ochentero & Neon Grid",
     tagline: "El sol retro definitivo de los 80 con tonalidades violeta, dorado y magenta.",
     price: 5.99,
@@ -50,6 +52,7 @@ export const PRODUCTS = [
   {
     id: "black-matte-minimal",
     name: "Black Matte Minimal",
+    tags: ["black", "matte", "minimal", "negro", "carbon", "elegante", "dorado"],
     subtitle: "Stealth Carbon & Detalle Dorado",
     tagline: "Elegancia pura en negro mate profundo con sutiles acentos geométricos dorados.",
     price: 5.99,

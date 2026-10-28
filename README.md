@@ -1,6 +1,6 @@
-# 💳 TargetSticker — Landing Page E-commerce & Validación Fake Door
+# TargetSticker — Registro de interés para pegatinas
 
-Landing page moderna, minimalista y de alto impacto para **TargetSticker** (pegatinas de vinilo personalizadas para tarjetas de crédito y débito), diseñada para validar la demanda real del mercado mediante un flujo **MVP Fake Door** con pasarela PayPal y guardado de pedidos en tiempo real en **Supabase**.
+Catálogo de pegatinas de vinilo para tarjetas. Las personas interesadas se registran con nombre, apellidos y correo; confirman su correo con un enlace de acceso y reciben el aviso de que compartiremos novedades en 7 días.
 
 ---
 
@@ -16,16 +16,16 @@ Landing page moderna, minimalista y de alto impacto para **TargetSticker** (pega
      - 🌅 **Retro Wave** (5.99€ · Envío gratis)
      - 🖤 **Black Matte Minimal** (5.99€ · Envío gratis)
    - Fácilmente ampliable: solo añade un nuevo objeto al array `PRODUCTS`.
-3. **Flujo de Validación Fake Door (MVP)**:
-   - Modal limpio y accesible utilizando el elemento nativo `<dialog>` de HTML5 con contención de scroll (`overscroll-behavior: contain`) según estándares modernos de la web.
-   - Captura de correo electrónico y selección de modelo.
-   - Integración oficial del SDK de botones inteligentes de **PayPal**.
-   - Botón de **"⚡ Simular Pago (Test / Demo)"** para pruebas inmediatas sin necesidad de credenciales en local.
-   - Pantalla de confirmación con confeti festivo y el mensaje de reserva para la hornada en 7 días.
+3. **Registro de interés**:
+   - El modal `<dialog>` solicita nombre, apellidos y correo.
+   - Supabase Auth envía un enlace de acceso por correo; la solicitud solo se registra después de iniciar sesión.
+   - No se procesa ningún pago en esta fase.
+   - La pantalla de confirmación informa del aviso previsto en 7 días.
+   - El buscador del catálogo filtra por texto y por etiquetas configuradas en cada diseño.
 4. **Persistencia en Supabase**:
-   - Al confirmar el pago o la simulación, se registra automáticamente en la tabla `pedidos`.
-   - Campos: `id`, `email`, `modelo`, `estado` (`reservado_7_dias`), `created_at`.
-   - Mecanismo de resiliencia: copia de seguridad local en `localStorage` si no hay conexión de red.
+   - Se guarda cada interés confirmado en `pedidos`, asociado a `user_id`.
+   - Campos: nombre, apellidos, correo, modelo, estado y etiquetas.
+   - RLS permite insertar y consultar únicamente los registros del usuario autenticado.
 
 ---
 
@@ -34,8 +34,6 @@ Landing page moderna, minimalista y de alto impacto para **TargetSticker** (pega
 - **Vite 6** (Empaquetador ultra-rápido)
 - **Tailwind CSS 3** (Estilos modernos utilitarios)
 - **@supabase/supabase-js** (Cliente oficial de Supabase)
-- **PayPal JS SDK** (Botones oficiales de checkout)
-- **Canvas Confetti** (Efectos de celebración visual)
 - **Lucide Icons** (Iconografía limpia SVG)
 
 ---
@@ -45,43 +43,22 @@ Landing page moderna, minimalista y de alto impacto para **TargetSticker** (pega
 1. Crea un proyecto gratuito en [Supabase](https://supabase.com).
 2. Ve a la sección **SQL Editor** en el menú lateral.
 3. Copia y pega el contenido del archivo [`supabase_schema.sql`](./supabase_schema.sql) y pulsa **Run**.
-4. Este script creará automáticamente:
-   - La tabla `pedidos` con las columnas requeridas:
-     - `id` (UUID)
-     - `email` (TEXT)
-     - `modelo` (TEXT)
-     - `estado` (TEXT con valor por defecto `'reservado_7_dias'`)
-     - `created_at` (TIMESTAMP)
-   - Las políticas RLS (*Row Level Security*) para permitir que los compradores inserten sus pedidos de forma segura sin exponer los datos de otros clientes.
-5. Obtén tus credenciales en **Project Settings > API**:
-   - **Project URL**
-   - **anon / public key**
-
----
-
-## 🅿️ Configuración de PayPal
-
-1. Entra en tu panel de [PayPal Developer](https://developer.paypal.com/dashboard/applications).
-2. Crea una aplicación en la sección **Apps & Credentials**:
-   - Para modo de pruebas: copia tu **Sandbox Client ID**.
-   - Para producción (ventas reales): copia tu **Live Client ID**.
+4. En **Authentication > URL Configuration**, configura el **Site URL** y añade a **Redirect URLs** los orígenes permitidos, por ejemplo `http://localhost:5173/**` y el dominio de producción de Vercel. El enlace mágico vuelve a la página desde la que se solicitó.
+5. Obtén la **Project URL** y la **publishable key** desde **Project Settings > API**. La clave secreta no se debe usar en el navegador.
 
 ---
 
 ## ⚙️ Variables de Entorno
 
-Crea un archivo `.env` en la raíz del proyecto (basándote en `.env.example`):
+Crea un archivo `.env.local` en la raíz del proyecto:
 
 ```bash
-# Supabase
+# Supabase: la publishable key es apta para el cliente junto con RLS
 VITE_SUPABASE_URL="https://tu-proyecto.supabase.co"
-VITE_SUPABASE_ANON_KEY="tu-anon-key-aqui"
-
-# PayPal
-VITE_PAYPAL_CLIENT_ID="tu-paypal-client-id"
+VITE_SUPABASE_ANON_KEY="tu-publishable-key"
 ```
 
-> **Nota para Pruebas**: Si dejas las variables vacías, el proyecto arranca automáticamente en **Modo Demo**, guardando los pedidos en `localStorage` y permitiendo simular pagos al 100%.
+No pongas `SUPABASE_SECRET_KEY` en ninguna variable `VITE_`: Vite las expone al navegador. Si Supabase no está configurado, el formulario no registra solicitudes.
 
 ---
 
@@ -91,7 +68,7 @@ VITE_PAYPAL_CLIENT_ID="tu-paypal-client-id"
 # 1. Instalar dependencias
 npm install
 
-# 2. Iniciar servidor de desarrollo en http://localhost:3000
+# 2. Iniciar el servidor de desarrollo (Vite muestra la URL disponible)
 npm run dev
 
 # 3. Compilar para producción
@@ -119,15 +96,14 @@ Sube la carpeta del proyecto a tu repositorio favorito.
    - **Output Directory**: `dist`
 
 ### Paso 3: Configurar Variables de Entorno en Vercel
-En la sección **Environment Variables** antes de desplegar (o en *Settings > Environment Variables*), agrega las 3 variables:
+En *Settings > Environment Variables*, agrega las dos variables públicas:
 
 | Nombre de la Variable | Valor | Descripción |
 | :--- | :--- | :--- |
 | `VITE_SUPABASE_URL` | `https://xxxx.supabase.co` | URL de tu proyecto Supabase |
-| `VITE_SUPABASE_ANON_KEY` | `eyJhbGciOi...` | Llave pública anónima de Supabase |
-| `VITE_PAYPAL_CLIENT_ID` | `tu-paypal-client-id` | Client ID de PayPal (Live o Sandbox) |
+| `VITE_SUPABASE_ANON_KEY` | `tu-publishable-key` | Clave publicable de Supabase; RLS protege los datos |
 
-Haz clic en **Deploy** y tu tienda estará en línea en pocos segundos con certificado SSL gratuito y CDN mundial.
+Añade también el dominio de Vercel a las **Redirect URLs** de Supabase Auth y ejecuta `supabase_schema.sql` en SQL Editor para activar las columnas y políticas autenticadas. Después, despliega el proyecto.
 
 ---
 
@@ -139,6 +115,7 @@ Para agregar más modelos en el futuro, abre [`src/products.js`](./src/products.
 {
   id: "vapor-grid",
   name: "Vapor Grid",
+   tags: ["vaporwave", "neon", "retro"],
   subtitle: "Gradiente Holográfico",
   tagline: "Efecto prisma iridiscente para tarjetas de última generación.",
   price: 5.99,

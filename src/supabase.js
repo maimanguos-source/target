@@ -33,28 +33,17 @@ if (!isSupabaseConfigured) {
  * - estado (Texto: "reservado_7_dias")
  * - created_at (Timestamp con timezone)
  */
-export async function registrarPedido({ email, modelo, estado = 'reservado_7_dias' }) {
+export async function registrarPedido({ userId, nombre, apellidos, email, modelo, tags = [], estado = 'interesado_7_dias' }) {
   const payload = {
+    user_id: userId,
+    nombre: nombre.trim(),
+    apellidos: apellidos.trim(),
     email: email.trim().toLowerCase(),
     modelo: modelo.trim(),
+    tags,
     estado: estado.trim()
   };
 
-  // 1. Siempre guardamos una copia de seguridad en localStorage por resiliencia
-  try {
-    const backupKey = 'targetsticker_pedidos_backup';
-    const existing = JSON.parse(localStorage.getItem(backupKey) || '[]');
-    existing.push({
-      ...payload,
-      id: crypto.randomUUID ? crypto.randomUUID() : 'local-' + Date.now(),
-      created_at: new Date().toISOString()
-    });
-    localStorage.setItem(backupKey, JSON.stringify(existing));
-  } catch (err) {
-    console.warn('No se pudo guardar copia local en localStorage', err);
-  }
-
-  // 2. Si Supabase está conectado, insertamos en la base de datos
   if (supabase) {
     try {
       const { data, error } = await supabase
@@ -89,15 +78,6 @@ export async function registrarPedido({ email, modelo, estado = 'reservado_7_dia
     }
   }
 
-  // Si Supabase no está configurado, retorno con éxito simulado
-  return {
-    success: true,
-    data: {
-      id: 'demo-' + Math.random().toString(36).substring(2, 9),
-      ...payload,
-      created_at: new Date().toISOString()
-    },
-    demoMode: true
-  };
+  return { success: false, error: 'Supabase no está configurado.' };
 }
 

@@ -1,39 +1,8 @@
-import confetti from 'canvas-confetti';
 import { PRODUCTS, getProductById } from './products.js';
-import { renderPayPalButtons } from './paypal.js';
-import { registrarPedido } from './supabase.js';
+import { registrarPedido, supabase } from './supabase.js';
 
-let activeModel = PRODUCTS[0];
-let isProcessing = false;
+const PENDING_ORDER_KEY = 'targetsticker_pending_order';
 
-/**
- * Dispara confeti festivo para la pantalla de confirmación
- */
-function fireCelebrationConfetti() {
-  const duration = 2.5 * 1000;
-  const animationEnd = Date.now() + duration;
-  const defaults = { startVelocity: 30, spread: 360, ticks: 60, zIndex: 9999 };
-
-  function randomInRange(min, max) {
-    return Math.random() * (max - min) + min;
-  }
-
-  const interval = setInterval(function () {
-    const timeLeft = animationEnd - Date.now();
-
-    if (timeLeft <= 0) {
-      return clearInterval(interval);
-    }
-
-    const particleCount = 50 * (timeLeft / duration);
-    confetti({ ...defaults, particleCount, origin: { x: randomInRange(0.1, 0.3), y: Math.random() - 0.2 } });
-    confetti({ ...defaults, particleCount, origin: { x: randomInRange(0.7, 0.9), y: Math.random() - 0.2 } });
-  }, 250);
-}
-
-/**
- * Inicializa el modal nativo <dialog> y sus eventos
- */
 export function initCheckoutModal() {
   const dialog = document.getElementById('checkout-modal');
   if (!dialog) return;
@@ -42,13 +11,20 @@ export function initCheckoutModal() {
   const checkoutView = document.getElementById('modal-checkout-view');
   const successView = document.getElementById('modal-success-view');
   const emailInput = document.getElementById('checkout-email');
+  const firstNameInput = document.getElementById('checkout-first-name');
+  const lastNameInput = document.getElementById('checkout-last-name');
+  const reservationForm = document.getElementById('reservation-form');
+  const submitBtn = document.getElementById('reservation-submit-btn');
   const modelSelect = document.getElementById('checkout-model-select');
   const modalSelectedImg = document.getElementById('modal-selected-img');
   const modalSelectedName = document.getElementById('modal-selected-name');
   const modalSelectedPrice = document.getElementById('modal-selected-price');
-  const simulatePayBtn = document.getElementById('simulate-pay-btn');
   const modalErrorMsg = document.getElementById('modal-error-message');
+  const modalInfoMsg = document.getElementById('modal-info-message');
   const successDoneBtn = document.getElementById('success-done-btn');
+  let activeModel = PRODUCTS[0];
+  let currentSession = null;
+  let isProcessing = false;
 
   // Popular el selector de modelos
   if (modelSelect) {
@@ -75,109 +51,158 @@ export function initCheckoutModal() {
     if (!modalErrorMsg) return;
     modalErrorMsg.textContent = msg;
     modalErrorMsg.classList.remove('hidden');
-    setTimeout(() => {
-      modalErrorMsg.classList.add('hidden');
-    }, 5000);
+    if (modalInfoMsg) modalInfoMsg.classList.add('hidden');
   }
 
-  function getEmail() {
-    return emailInput ? emailInput.value.trim() : '';
+  function showInfo(msg) {
+    if (!modalInfoMsg) return;
+    modalInfoMsg.textContent = msg;
+    modalInfoMsg.classList.remove('hidden');
+    if (modalErrorMsg) modalErrorMsg.classList.add('hidden');
   }
 
-  function validateEmail(email) {
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    return emailRegex.test(email);
+  function getPendingOrder() {
+    try {
+      return JSON.parse(localStorage.getItem(PENDING_ORDER_KEY) || 'null');
+    } catch {
+      return null;
+    }
   }
 
-  async function handleOrderSuccess({ payerEmail, model }) {
-    if (isProcessing) return;
-    isProcessing = true;
+  function showConfirmation(pending) {
+    const model = getProductById(pending.productId);
+    if (checkoutView) checkoutView.classList.add('hidden');
+    if (successView) successView.classList.remove('hidden');
+    if (!dialog.open) dialog.showModal();
 
-    // Mostrar feedback visual de carga en el modal
-    const originalBtnText = simulatePayBtn ? simulatePayBtn.innerHTML : '';
-    if (simulatePayBtn) {
-      simulatePayBtn.disabled = true;
-      simulatePayBtn.innerHTML = `
-        <span class="inline-flex items-center gap-2">
-          <svg class="animate-spin h-4 w-4" fill="none" viewBox="0 0 24 24">
-            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path>
-          </svg>
-          Registrando tu reserva...
-        </span>
-      `;
+    const successEmail = document.getElementById('success-summary-email');
+    const successModel = document.getElementById('success-summary-model');
+    const successOrderDate = document.getElementById('success-summary-date');
+    const successBatchDate = document.getElementById('success-batch-date');
+    if (successEmail) successEmail.textContent = pending.email;
+    if (successModel) successModel.textContent = model.name;
+    if (successOrderDate) {
+      successOrderDate.textContent = new Date().toLocaleDateString('es-ES', {
+        day: '2-digit',
+        month: 'long',
+        year: 'numeric'
+      });
+    }
+    if (successBatchDate) {
+      const in7Days = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
+      successBatchDate.textContent = in7Days.toLocaleDateString('es-ES', {
+        weekday: 'long',
+        day: 'numeric',
+        month: 'long'
+      });
+    }
+  }
+
+  async function processPendingOrder(user) {
+    const pending = getPendingOrder();
+    if (!supabase || !user || !pending || isProcessing) return;
+    if (user.email?.toLowerCase() !== pending.email.toLowerCase()) {
+      showError('Inicia sesión con el mismo correo al que enviamos el enlace.');
+      return;
     }
 
+    isProcessing = true;
+    if (submitBtn) submitBtn.disabled = true;
     try {
-      // 1. Guardar en Supabase en la tabla "pedidos"
       const result = await registrarPedido({
-        email: payerEmail,
-        modelo: model.name,
-        estado: 'reservado_7_dias'
+        userId: user.id,
+        nombre: pending.firstName,
+        apellidos: pending.lastName,
+        email: user.email,
+        modelo: getProductById(pending.productId).name,
+        tags: getProductById(pending.productId).tags,
+        estado: 'interesado_7_dias'
       });
 
-      console.log('Resultado del pedido:', result);
-
-      // 2. Transicionar a la vista de confirmación "Fake Door"
-      if (checkoutView) checkoutView.classList.add('hidden');
-      if (successView) successView.classList.remove('hidden');
-
-      // Actualizar detalles del resumen de éxito
-      const successEmail = document.getElementById('success-summary-email');
-      const successModel = document.getElementById('success-summary-model');
-      const successOrderDate = document.getElementById('success-summary-date');
-      const successBatchDate = document.getElementById('success-batch-date');
-
-      if (successEmail) successEmail.textContent = payerEmail;
-      if (successModel) successModel.textContent = model.name;
-      if (successOrderDate) {
-        successOrderDate.textContent = new Date().toLocaleDateString('es-ES', {
-          day: '2-digit',
-          month: 'long',
-          year: 'numeric'
-        });
-      }
-
-      // Fecha estimada en 7 días
-      if (successBatchDate) {
-        const in7Days = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
-        successBatchDate.textContent = in7Days.toLocaleDateString('es-ES', {
-          weekday: 'long',
-          day: 'numeric',
-          month: 'long'
-        });
-      }
-
-      // 3. Disparar confeti festivo
-      fireCelebrationConfetti();
-
+      if (!result.success) throw new Error(result.error || 'No se pudo guardar la solicitud.');
+      localStorage.removeItem(PENDING_ORDER_KEY);
+      showConfirmation(pending);
     } catch (err) {
-      console.error('Error al procesar reserva:', err);
-      showError('Ocurrió un error inesperado. Por favor inténtalo de nuevo.');
+      console.error('Error al registrar interés:', err);
+      showError('No se pudo guardar tu solicitud. Inténtalo de nuevo en unos minutos.');
     } finally {
       isProcessing = false;
-      if (simulatePayBtn) {
-        simulatePayBtn.disabled = false;
-        simulatePayBtn.innerHTML = originalBtnText;
-      }
+      if (submitBtn) submitBtn.disabled = false;
     }
   }
 
-  // Evento botón Simular Pago (Test / Demo)
-  if (simulatePayBtn) {
-    simulatePayBtn.addEventListener('click', async (e) => {
-      e.preventDefault();
-      const email = getEmail();
-      if (!validateEmail(email)) {
-        showError('Por favor introduce un correo electrónico válido para recibir tu número de seguimiento.');
-        if (emailInput) emailInput.focus();
+  function setSessionUser(user) {
+    currentSession = user ? { user } : null;
+    if (!emailInput || !user) return;
+    emailInput.value = user.email || '';
+    emailInput.readOnly = true;
+    if (submitBtn) submitBtn.textContent = 'Confirmar mi interés';
+  }
+
+  if (reservationForm) {
+    reservationForm.addEventListener('submit', async (event) => {
+      event.preventDefault();
+      if (!supabase) {
+        showError('El registro no está disponible ahora. Inténtalo más tarde.');
         return;
       }
 
-      await handleOrderSuccess({
-        payerEmail: email,
-        model: activeModel
-      });
+      const firstName = firstNameInput.value.trim();
+      const lastName = lastNameInput.value.trim();
+      const email = emailInput.value.trim().toLowerCase();
+      if (!firstName || !lastName || !email) {
+        showError('Completa tu nombre, apellidos y correo electrónico.');
+        return;
+      }
+
+      if (currentSession?.user.email?.toLowerCase() !== email && currentSession) {
+        showError('El correo debe coincidir con la sesión iniciada.');
+        return;
+      }
+
+      const pending = {
+        firstName,
+        lastName,
+        email,
+        productId: activeModel.id
+      };
+
+      try {
+        localStorage.setItem(PENDING_ORDER_KEY, JSON.stringify(pending));
+      } catch {
+        showError('No se pudo guardar temporalmente la solicitud. Revisa la configuración del navegador.');
+        return;
+      }
+
+      if (currentSession?.user) {
+        await processPendingOrder(currentSession.user);
+        return;
+      }
+
+      if (submitBtn) {
+        submitBtn.disabled = true;
+        submitBtn.textContent = 'Enviando enlace...';
+      }
+      try {
+        const { error } = await supabase.auth.signInWithOtp({
+          email,
+          options: {
+            shouldCreateUser: true,
+            data: { nombre: firstName, apellidos: lastName },
+            emailRedirectTo: `${window.location.origin}${window.location.pathname}`
+          }
+        });
+        if (error) throw error;
+        showInfo('Te hemos enviado un enlace. Ábrelo en este mismo navegador para confirmar tu registro y guardar la solicitud.');
+      } catch (err) {
+        localStorage.removeItem(PENDING_ORDER_KEY);
+        showError(err.message || 'No se pudo enviar el enlace. Comprueba el correo e inténtalo de nuevo.');
+      } finally {
+        if (submitBtn) {
+          submitBtn.disabled = false;
+          submitBtn.textContent = 'Continuar por correo';
+        }
+      }
     });
   }
 
@@ -207,31 +232,43 @@ export function initCheckoutModal() {
     }
   });
 
-  // Al abrir el modal
   window.openCheckoutModal = function (productId) {
     if (productId) {
       updateSelectedModel(productId);
     }
-    // Restablecer vistas
     if (checkoutView) checkoutView.classList.remove('hidden');
     if (successView) successView.classList.add('hidden');
     if (modalErrorMsg) modalErrorMsg.classList.add('hidden');
+    if (modalInfoMsg) modalInfoMsg.classList.add('hidden');
 
     dialog.showModal();
+    setTimeout(() => firstNameInput?.focus(), 50);
 
-    // Autofocus en el input de email
-    setTimeout(() => {
-      if (emailInput) emailInput.focus();
-    }, 50);
-
-    // Renderizar botones de PayPal
-    renderPayPalButtons({
-      containerId: 'paypal-button-container',
-      getModel: () => activeModel,
-      getEmail: () => getEmail(),
-      onPaymentSuccess: handleOrderSuccess,
-      onError: showError
-    });
+    if (currentSession?.user) {
+      setSessionUser(currentSession.user);
+    } else {
+      emailInput.readOnly = false;
+      if (submitBtn) submitBtn.textContent = 'Continuar por correo';
+    }
   };
+
+  if (supabase) {
+    supabase.auth.onAuthStateChange((_event, session) => {
+      currentSession = session;
+      if (session?.user) {
+        setSessionUser(session.user);
+        setTimeout(() => processPendingOrder(session.user), 0);
+      }
+    });
+
+    supabase.auth.getSession().then(({ data, error }) => {
+      if (error) return;
+      currentSession = data.session;
+      if (data.session?.user) {
+        setSessionUser(data.session.user);
+        void processPendingOrder(data.session.user);
+      }
+    });
+  }
 }
 
