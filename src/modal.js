@@ -19,12 +19,18 @@ export function initCheckoutModal() {
   const modalSelectedImg = document.getElementById('modal-selected-img');
   const modalSelectedName = document.getElementById('modal-selected-name');
   const modalSelectedPrice = document.getElementById('modal-selected-price');
+  const reviewName = document.getElementById('checkout-review-name');
+  const reviewPrice = document.getElementById('checkout-review-price');
   const modalErrorMsg = document.getElementById('modal-error-message');
   const modalInfoMsg = document.getElementById('modal-info-message');
   const successDoneBtn = document.getElementById('success-done-btn');
+  const stepTabs = [...dialog.querySelectorAll('[data-checkout-step]')];
+  const stepPanels = [...dialog.querySelectorAll('[data-checkout-panel]')];
   let activeModel = PRODUCTS[0];
   let currentSession = null;
   let isProcessing = false;
+  let currentStep = 1;
+  let maxVisitedStep = 1;
 
   // Popular el selector de modelos
   if (modelSelect) {
@@ -42,9 +48,31 @@ export function initCheckoutModal() {
     if (modalSelectedImg) modalSelectedImg.src = activeModel.image;
     if (modalSelectedName) modalSelectedName.textContent = activeModel.name;
     if (modalSelectedPrice) modalSelectedPrice.textContent = `${activeModel.priceFormatted} · Envío gratis`;
+    if (reviewName) reviewName.textContent = activeModel.name;
+    if (reviewPrice) reviewPrice.textContent = activeModel.priceFormatted;
     if (modelSelect && modelSelect.value !== activeModel.id) {
       modelSelect.value = activeModel.id;
     }
+  }
+
+  function updateCheckoutStep(step) {
+    currentStep = step;
+    if (modalErrorMsg) modalErrorMsg.classList.add('hidden');
+    if (modalInfoMsg) modalInfoMsg.classList.add('hidden');
+    stepTabs.forEach((tab) => {
+      const tabStep = Number(tab.dataset.checkoutStep);
+      const isActive = tabStep === step;
+      tab.classList.toggle('is-active', isActive);
+      tab.classList.toggle('is-complete', tabStep < step);
+      tab.setAttribute('aria-selected', String(isActive));
+      tab.tabIndex = isActive ? 0 : -1;
+      tab.disabled = tabStep > maxVisitedStep;
+    });
+    stepPanels.forEach((panel) => {
+      const isActive = Number(panel.dataset.checkoutPanel) === step;
+      panel.hidden = !isActive;
+      panel.classList.toggle('hidden', !isActive);
+    });
   }
 
   function showError(msg) {
@@ -139,9 +167,66 @@ export function initCheckoutModal() {
     if (submitBtn) submitBtn.textContent = 'Confirmar mi interés';
   }
 
+  stepTabs.forEach((tab) => {
+    tab.addEventListener('click', () => {
+      const step = Number(tab.dataset.checkoutStep);
+      if (step <= maxVisitedStep) updateCheckoutStep(step);
+    });
+    tab.addEventListener('keydown', (event) => {
+      if (event.key !== 'ArrowLeft' && event.key !== 'ArrowRight') return;
+      event.preventDefault();
+      const availableTabs = stepTabs.filter((stepTab) => Number(stepTab.dataset.checkoutStep) <= maxVisitedStep);
+      const currentIndex = availableTabs.indexOf(tab);
+      const direction = event.key === 'ArrowRight' ? 1 : -1;
+      const nextTab = availableTabs[(currentIndex + direction + availableTabs.length) % availableTabs.length];
+      updateCheckoutStep(Number(nextTab.dataset.checkoutStep));
+      nextTab.focus();
+    });
+  });
+
+  dialog.querySelectorAll('[data-step-next]').forEach((button) => {
+    button.addEventListener('click', () => {
+      if (currentStep === 2) {
+        const missingName = [firstNameInput, lastNameInput].find((input) => !input.value.trim());
+        if (missingName) {
+          showError('Escribe tu nombre y apellidos para continuar.');
+          missingName.focus();
+          return;
+        }
+      }
+
+      const nextStep = Number(button.dataset.stepNext);
+      maxVisitedStep = Math.max(maxVisitedStep, nextStep);
+      if (modalErrorMsg) modalErrorMsg.classList.add('hidden');
+      updateCheckoutStep(nextStep);
+      if (nextStep === 2) firstNameInput?.focus();
+      if (nextStep === 3) emailInput?.focus();
+    });
+  });
+
+  dialog.querySelectorAll('[data-step-back]').forEach((button) => {
+    button.addEventListener('click', () => updateCheckoutStep(Number(button.dataset.stepBack)));
+  });
+
   if (reservationForm) {
     reservationForm.addEventListener('submit', async (event) => {
       event.preventDefault();
+      const missingName = [firstNameInput, lastNameInput].find((input) => !input.value.trim());
+      if (missingName) {
+        updateCheckoutStep(2);
+        showError('Escribe tu nombre y apellidos para continuar.');
+        missingName.focus();
+        return;
+      }
+
+      if (!emailInput.checkValidity()) {
+        updateCheckoutStep(3);
+        showError('Introduce un correo electrónico válido para continuar.');
+        emailInput.focus();
+        emailInput.reportValidity();
+        return;
+      }
+
       if (!supabase) {
         showError('El registro no está disponible ahora. Inténtalo más tarde.');
         return;
@@ -200,7 +285,7 @@ export function initCheckoutModal() {
       } finally {
         if (submitBtn) {
           submitBtn.disabled = false;
-          submitBtn.textContent = 'Continuar por correo';
+          submitBtn.textContent = currentSession?.user ? 'Confirmar mi interés' : 'Enviarme el enlace seguro';
         }
       }
     });
@@ -241,14 +326,17 @@ export function initCheckoutModal() {
     if (modalErrorMsg) modalErrorMsg.classList.add('hidden');
     if (modalInfoMsg) modalInfoMsg.classList.add('hidden');
 
+    currentStep = 1;
+    maxVisitedStep = 1;
+    updateCheckoutStep(1);
     dialog.showModal();
-    setTimeout(() => firstNameInput?.focus(), 50);
+    setTimeout(() => modelSelect?.focus(), 50);
 
     if (currentSession?.user) {
       setSessionUser(currentSession.user);
     } else {
-      emailInput.readOnly = false;
-      if (submitBtn) submitBtn.textContent = 'Continuar por correo';
+      if (emailInput) emailInput.readOnly = false;
+      if (submitBtn) submitBtn.textContent = 'Enviarme el enlace seguro';
     }
   };
 

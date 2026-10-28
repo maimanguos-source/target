@@ -1,6 +1,13 @@
 <!DOCTYPE html>
 <html lang="es" class="scroll-smooth">
   <head>
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-NE8EFYE4QW"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){window.dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'G-NE8EFYE4QW');
+    </script>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>TargetSticker — Personaliza tu tarjeta con estilo | Pegatinas de Vinilo Premium</title>
@@ -104,33 +111,6 @@
         transition: transform 0.15s ease, box-shadow 0.15s ease;
       }
 
-      /* 3D Card Interactive Perspective */
-      .card-perspective-container {
-        perspective: 1000px;
-      }
-
-      .card-3d-element {
-        transform-style: preserve-3d;
-        transition: transform 0.15s ease-out;
-        will-change: transform;
-      }
-
-      .card-glare {
-        position: absolute;
-        inset: 0;
-        border-radius: inherit;
-        pointer-events: none;
-        background: radial-gradient(
-          circle at var(--mouse-x, 50%) var(--mouse-y, 50%),
-          rgba(255, 255, 255, 0.5) 0%,
-          rgba(255, 255, 255, 0.1) 45%,
-          transparent 75%
-        );
-        opacity: var(--glare-opacity, 0);
-        transition: opacity 0.2s ease;
-        mix-blend-mode: overlay;
-      }
-
       /* Custom scrollbar */
       ::-webkit-scrollbar {
         width: 8px;
@@ -146,8 +126,8 @@
         background: #94a3b8;
       }
     </style>
-    <script type="module" crossorigin src="/assets/index-CoVmm0da.js"></script>
-    <link rel="stylesheet" crossorigin href="/assets/index-CexKdPgE.css">
+    <script type="module" crossorigin src="/assets/index-KNrhMdeS.js"></script>
+    <link rel="stylesheet" crossorigin href="/assets/index-BDEEzg7G.css">
   </head>
   <body class="bg-white text-slate-900 min-h-screen flex flex-col font-sans antialiased selection:bg-brand-600 selection:text-white">
     
@@ -230,10 +210,10 @@
         <div class="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[700px] h-[350px] bg-blue-100/60 blur-[130px] rounded-full pointer-events-none"></div>
 
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative">
-          <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-8 items-center">
+          <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-10 items-center">
             
             <!-- Columna Texto y Copy -->
-            <div class="lg:col-span-7 space-y-6 text-center lg:text-left">
+            <div class="lg:col-span-12 space-y-6 text-center lg:text-left">
               
               <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-blue-50 border border-blue-200 text-xs font-bold text-brand-700">
                 <span class="w-2 h-2 rounded-full bg-brand-600 animate-ping"></span>
@@ -242,12 +222,20 @@
                 <span class="text-brand-700 font-extrabold">Envío gratis en todos los diseños</span>
               </div>
 
-              <h1 class="text-4xl sm:text-5xl lg:text-6xl font-black font-display tracking-tight text-slate-900 leading-[1.15]">
-                Personaliza tu tarjeta <br class="hidden sm:inline" />
-                <span class="text-brand-600">
-                  con estilo.
-                </span>
-              </h1>
+              <div class="flex flex-col items-center gap-5 sm:flex-row sm:justify-center lg:justify-start">
+                <h1 class="text-4xl sm:text-5xl lg:text-6xl font-black font-display tracking-tight text-slate-900 leading-[1.15]">
+                  Personaliza tu tarjeta
+                  <span class="text-brand-600">con estilo.</span>
+                </h1>
+                <div class="hero-mascot-3d shrink-0" aria-hidden="true">
+                  <img
+                    src="/hero-product.png"
+                    alt=""
+                    class="h-36 w-36 object-contain sm:h-40 sm:w-40 lg:h-48 lg:w-48"
+                    fetchpriority="high"
+                  />
+                </div>
+              </div>
 
               <p class="text-base sm:text-lg text-slate-600 max-w-2xl mx-auto lg:mx-0 font-normal leading-relaxed">
                 Transforma ese aburrido plástico bancario en una pieza única en menos de 20 segundos. Vinilo premium laminado de 80 micras, corte de chip micrométrico y protección total contra el desgaste de la cartera.
@@ -303,80 +291,6 @@
 
             </div>
 
-            <!-- Columna Simulador Interactivo 3D -->
-            <div class="lg:col-span-5 flex flex-col items-center">
-              
-              <!-- Selector Rápido de Diseños (Blanco y Azul) -->
-              <div id="hero-design-selectors" class="mb-4 flex max-w-full flex-wrap items-center justify-center gap-2 rounded-2xl border border-slate-200 bg-white p-1.5 shadow-sm">
-                <button 
-                  type="button" 
-                  data-design-id="catalog-001"
-                  class="hero-design-selector px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all bg-brand-600 text-white shadow-sm cursor-pointer"
-                >
-                  Papel Roto
-                </button>
-                <button 
-                  type="button" 
-                  data-design-id="catalog-009"
-                  class="hero-design-selector px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all bg-white text-slate-600 hover:text-brand-600 hover:bg-blue-50 cursor-pointer"
-                >
-                  Terror
-                </button>
-                <button 
-                  type="button" 
-                  data-design-id="catalog-024"
-                  class="hero-design-selector px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all bg-white text-slate-600 hover:text-brand-600 hover:bg-blue-50 cursor-pointer"
-                >
-                  Anime
-                </button>
-              </div>
-
-              <!-- Contenedor 3D con Perspectiva -->
-              <div 
-                id="hero-card-container" 
-                class="card-perspective-container relative w-full max-w-[420px] aspect-[16/11] cursor-grab active:cursor-grabbing select-none"
-              >
-                <!-- Tarjeta Interactiva con Transform 3D -->
-                <div 
-                  id="hero-3d-card" 
-                  class="card-3d-element relative w-full h-full rounded-3xl overflow-hidden p-2 flex items-center justify-center"
-                >
-                  <!-- Mockup de la Tarjeta con Sombra Realista -->
-                  <img 
-                    id="hero-card-preview-img" 
-                    src="/products/catalog-001.webp"
-                    alt="Vista previa de la pegatina para tarjeta de crédito" 
-                    class="w-full h-full object-contain filter drop-shadow-[0_20px_25px_rgba(37,99,235,0.2)] transition-all duration-300"
-                  />
-
-                  <!-- Capa de Brillo y Reflejo Especular Dinámico -->
-                  <div id="hero-card-glare" class="card-glare"></div>
-
-                  <!-- Badge Flotante Interactivo -->
-                  <div class="absolute -top-3 -right-3 z-20 pointer-events-none">
-                    <span class="sticker-badge bg-brand-600 text-white text-[11px] shadow-md shadow-brand-600/30">
-                      ¡Pruébalo en 3D! ↗
-                    </span>
-                  </div>
-                </div>
-              </div>
-
-              <!-- Info de la Tarjeta Seleccionada -->
-              <div class="mt-4 text-center">
-                <h4 id="hero-card-name" class="text-base font-bold text-slate-900">Pegatinas Papel Roto - Z1</h4>
-                <p id="hero-card-subtitle" class="text-xs text-slate-500 mb-3">Diseño para tarjetas bancarias</p>
-                <button 
-                  type="button" 
-                  id="hero-preview-buy-btn"
-                  class="text-xs font-extrabold text-brand-600 hover:text-brand-700 flex items-center justify-center gap-1 mx-auto underline underline-offset-4 cursor-pointer"
-                >
-                  <span>Apuntarme a esta hornada</span>
-                  <i data-lucide="chevron-right" class="w-3.5 h-3.5"></i>
-                </button>
-              </div>
-
-            </div>
-
           </div>
         </div>
       </section>
@@ -397,7 +311,7 @@
             </p>
           </div>
 
-          <div class="max-w-xl mx-auto mb-6">
+          <div class="mx-auto mb-6 max-w-2xl">
             <label for="product-search" class="sr-only">Buscar diseños por nombre, estilo o etiqueta</label>
             <div class="relative">
               <i data-lucide="search" class="w-5 h-5 absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"></i>
@@ -412,200 +326,54 @@
             <p id="product-search-status" class="mt-2 text-xs text-slate-500" aria-live="polite"></p>
           </div>
 
-          <div class="mb-4 flex justify-end gap-2">
-            <button id="products-previous" type="button" aria-label="Productos anteriores" title="Productos anteriores" class="carousel-control" disabled>
-              <i data-lucide="chevron-left" class="h-5 w-5"></i>
-            </button>
-            <button id="products-next" type="button" aria-label="Más productos" title="Más productos" class="carousel-control">
-              <i data-lucide="chevron-right" class="h-5 w-5"></i>
-            </button>
+          <div class="mb-6 rounded-3xl border border-slate-200 bg-white p-4 shadow-sm sm:p-5">
+            <div class="mb-4 flex flex-wrap items-center justify-between gap-2">
+              <div>
+                <h3 class="text-sm font-extrabold text-slate-900">Encuentra tu diseño</h3>
+                <p class="mt-1 text-xs text-slate-500">Filtra por colección, etiqueta y precio.</p>
+              </div>
+              <button id="catalog-reset" type="button" class="text-xs font-bold text-brand-700 underline decoration-brand-200 underline-offset-4 hover:text-brand-900">
+                Limpiar filtros
+              </button>
+            </div>
+            <div class="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-5">
+              <label class="text-xs font-bold text-slate-600">
+                Colección
+                <select id="catalog-category" class="mt-1.5 w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2.5 text-xs font-medium text-slate-800 focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-100">
+                  <option value="">Todas las colecciones</option>
+                </select>
+              </label>
+              <label class="text-xs font-bold text-slate-600">
+                Etiqueta
+                <select id="catalog-tag" class="mt-1.5 w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2.5 text-xs font-medium text-slate-800 focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-100">
+                  <option value="">Todas las etiquetas</option>
+                </select>
+              </label>
+              <label class="text-xs font-bold text-slate-600">
+                Precio mínimo (€)
+                <input id="catalog-min-price" type="number" min="0" step="0.01" inputmode="decimal" placeholder="Sin mínimo" class="mt-1.5 w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2.5 text-xs font-medium text-slate-800 placeholder:text-slate-400 focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-100" />
+              </label>
+              <label class="text-xs font-bold text-slate-600">
+                Precio máximo (€)
+                <input id="catalog-max-price" type="number" min="0" step="0.01" inputmode="decimal" placeholder="Sin máximo" class="mt-1.5 w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2.5 text-xs font-medium text-slate-800 placeholder:text-slate-400 focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-100" />
+              </label>
+              <label class="text-xs font-bold text-slate-600">
+                Ordenar por
+                <select id="catalog-sort" class="mt-1.5 w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2.5 text-xs font-medium text-slate-800 focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-100">
+                  <option value="catalog">Orden del catálogo</option>
+                  <option value="rating">Mejor valorados</option>
+                  <option value="price-asc">Precio: menor a mayor</option>
+                  <option value="price-desc">Precio: mayor a menor</option>
+                  <option value="name">Nombre: A–Z</option>
+                </select>
+              </label>
+            </div>
           </div>
 
-          <div id="products-grid" class="product-carousel" aria-label="Catálogo de modelos">
-            <template id="legacy-product-cards">
-            
-            <!-- Producto 1: Cyberpunk Neon -->
-            <article data-product-card data-product-tags="cyberpunk neon synthwave digital cian magenta" class="group relative rounded-3xl bg-white border border-slate-200/90 overflow-hidden hover:border-brand-500 transition-all duration-300 hover:shadow-card-hover flex flex-col">
-              <div class="absolute top-4 left-4 z-10">
-                <span class="sticker-badge bg-brand-600 text-white shadow-sm">Más Popular</span>
-              </div>
-              <div class="relative w-full aspect-[16/11] bg-slate-100 overflow-hidden flex items-center justify-center p-6 border-b border-slate-100">
-                <img 
-                  src="/assets/mockup-cyberpunk-Dxm62N2S.png" 
-                  alt="Pegatina para tarjeta modelo Cyberpunk Neon" 
-                  class="w-full max-w-[340px] drop-shadow-[0_12px_20px_rgba(0,0,0,0.18)] group-hover:scale-105 group-hover:-rotate-1 transition-transform duration-500 object-contain"
-                  loading="lazy"
-                />
-                <div class="absolute bottom-3 right-4 text-[11px] font-mono text-slate-600 bg-white/90 px-2 py-0.5 rounded-full border border-slate-200 shadow-sm backdrop-blur-sm">
-                  80μm Ultra-slim
-                </div>
-              </div>
-              <div class="p-6 md:p-8 flex-1 flex flex-col justify-between">
-                <div>
-                  <div class="flex items-baseline justify-between mb-2">
-                    <h3 class="text-xl md:text-2xl font-bold font-display text-slate-900 group-hover:text-brand-600 transition-colors">
-                      Cyberpunk Neon
-                    </h3>
-                    <span class="text-2xl font-extrabold text-brand-600">5.99€</span>
-                  </div>
-                  <p class="text-sm text-slate-500 font-medium mb-4">Estética Synthwave & Circuito Digital</p>
-                  <p class="text-xs text-slate-600 leading-relaxed mb-6">Líneas de neón cian y magenta sobre horizonte cibernético profundo.</p>
-                  <ul class="space-y-2.5 mb-6 border-t border-slate-100 pt-4">
-                    <li class="flex items-center gap-2 text-xs text-slate-700">
-                      <i data-lucide="check-circle-2" class="w-4 h-4 text-brand-600 shrink-0"></i>
-                      <span>Laminado mate antirreflejos</span>
-                    </li>
-                    <li class="flex items-center gap-2 text-xs text-slate-700">
-                      <i data-lucide="check-circle-2" class="w-4 h-4 text-brand-600 shrink-0"></i>
-                      <span>Ventana estándar para chip EMV</span>
-                    </li>
-                    <li class="flex items-center gap-2 text-xs text-slate-700">
-                      <i data-lucide="check-circle-2" class="w-4 h-4 text-brand-600 shrink-0"></i>
-                      <span>100% impermeable y lavable</span>
-                    </li>
-                  </ul>
-                </div>
-                <div>
-                  <div class="flex items-center justify-between text-xs mb-4 bg-blue-50/70 px-3.5 py-2.5 rounded-xl border border-blue-100">
-                    <span class="flex items-center gap-1.5 text-brand-700 font-bold">
-                      <i data-lucide="truck" class="w-3.5 h-3.5"></i> Envío gratis incluido
-                    </span>
-                    <span class="text-slate-500 font-medium">Stock Limitado</span>
-                  </div>
-                  <button 
-                    type="button" 
-                    onclick="openCheckoutModal('cyberpunk-neon')"
-                    class="w-full py-3.5 px-6 rounded-2xl bg-brand-600 hover:bg-brand-700 text-white font-extrabold text-sm md:text-base tracking-wide flex items-center justify-center gap-2 shadow-md shadow-brand-600/25 hover:shadow-brand-600/40 hover:scale-[1.02] active:scale-[0.98] transition-all cursor-pointer"
-                  >
-                    <i data-lucide="shopping-bag" class="w-4 h-4"></i>
-                    <span>Me interesa este diseño</span>
-                  </button>
-                </div>
-              </div>
-            </article>
+          <div id="products-grid" class="catalog-grid" aria-label="Catálogo de modelos">
 
-            <!-- Producto 2: Retro Wave -->
-            <article data-product-card data-product-tags="retro wave 80s nostalgia synthwave atardecer violeta dorado" class="group relative rounded-3xl bg-white border border-slate-200/90 overflow-hidden hover:border-brand-500 transition-all duration-300 hover:shadow-card-hover flex flex-col">
-              <div class="absolute top-4 left-4 z-10">
-                <span class="sticker-badge bg-blue-50 text-brand-700 border border-blue-200 shadow-sm">Edición Nostalgia</span>
-              </div>
-              <div class="relative w-full aspect-[16/11] bg-slate-100 overflow-hidden flex items-center justify-center p-6 border-b border-slate-100">
-                <img 
-                  src="/assets/mockup-retro-CJbXFOte.png" 
-                  alt="Pegatina para tarjeta modelo Retro Wave" 
-                  class="w-full max-w-[340px] drop-shadow-[0_12px_20px_rgba(0,0,0,0.18)] group-hover:scale-105 group-hover:-rotate-1 transition-transform duration-500 object-contain"
-                  loading="lazy"
-                />
-                <div class="absolute bottom-3 right-4 text-[11px] font-mono text-slate-600 bg-white/90 px-2 py-0.5 rounded-full border border-slate-200 shadow-sm backdrop-blur-sm">
-                  80μm Ultra-slim
-                </div>
-              </div>
-              <div class="p-6 md:p-8 flex-1 flex flex-col justify-between">
-                <div>
-                  <div class="flex items-baseline justify-between mb-2">
-                    <h3 class="text-xl md:text-2xl font-bold font-display text-slate-900 group-hover:text-brand-600 transition-colors">
-                      Retro Wave
-                    </h3>
-                    <span class="text-2xl font-extrabold text-brand-600">5.99€</span>
-                  </div>
-                  <p class="text-sm text-slate-500 font-medium mb-4">Atardecer Ochentero & Neon Grid</p>
-                  <p class="text-xs text-slate-600 leading-relaxed mb-6">El sol retro definitivo de los 80 con tonalidades violeta, dorado y magenta.</p>
-                  <ul class="space-y-2.5 mb-6 border-t border-slate-100 pt-4">
-                    <li class="flex items-center gap-2 text-xs text-slate-700">
-                      <i data-lucide="check-circle-2" class="w-4 h-4 text-brand-600 shrink-0"></i>
-                      <span>Acabado táctil suave satinado</span>
-                    </li>
-                    <li class="flex items-center gap-2 text-xs text-slate-700">
-                      <i data-lucide="check-circle-2" class="w-4 h-4 text-brand-600 shrink-0"></i>
-                      <span>Corte láser de precisión micrométrica</span>
-                    </li>
-                    <li class="flex items-center gap-2 text-xs text-slate-700">
-                      <i data-lucide="check-circle-2" class="w-4 h-4 text-brand-600 shrink-0"></i>
-                      <span>Compatible con contactless y cajeros</span>
-                    </li>
-                  </ul>
-                </div>
-                <div>
-                  <div class="flex items-center justify-between text-xs mb-4 bg-blue-50/70 px-3.5 py-2.5 rounded-xl border border-blue-100">
-                    <span class="flex items-center gap-1.5 text-brand-700 font-bold">
-                      <i data-lucide="truck" class="w-3.5 h-3.5"></i> Envío gratis incluido
-                    </span>
-                    <span class="text-slate-500 font-medium">Stock Limitado</span>
-                  </div>
-                  <button 
-                    type="button" 
-                    onclick="openCheckoutModal('retro-wave')"
-                    class="w-full py-3.5 px-6 rounded-2xl bg-brand-600 hover:bg-brand-700 text-white font-extrabold text-sm md:text-base tracking-wide flex items-center justify-center gap-2 shadow-md shadow-brand-600/25 hover:shadow-brand-600/40 hover:scale-[1.02] active:scale-[0.98] transition-all cursor-pointer"
-                  >
-                    <i data-lucide="shopping-bag" class="w-4 h-4"></i>
-                    <span>Me interesa este diseño</span>
-                  </button>
-                </div>
-              </div>
-            </article>
-
-            <!-- Producto 3: Black Matte Minimal -->
-            <article data-product-card data-product-tags="black matte minimal negro carbon elegante dorado" class="group relative rounded-3xl bg-white border border-slate-200/90 overflow-hidden hover:border-brand-500 transition-all duration-300 hover:shadow-card-hover flex flex-col">
-              <div class="absolute top-4 left-4 z-10">
-                <span class="sticker-badge bg-slate-900 text-white shadow-sm">Minimalista</span>
-              </div>
-              <div class="relative w-full aspect-[16/11] bg-slate-100 overflow-hidden flex items-center justify-center p-6 border-b border-slate-100">
-                <img 
-                  src="/assets/mockup-minimal-cG5sdR5N.png" 
-                  alt="Pegatina para tarjeta modelo Black Matte Minimal" 
-                  class="w-full max-w-[340px] drop-shadow-[0_12px_20px_rgba(0,0,0,0.18)] group-hover:scale-105 group-hover:-rotate-1 transition-transform duration-500 object-contain"
-                  loading="lazy"
-                />
-                <div class="absolute bottom-3 right-4 text-[11px] font-mono text-slate-600 bg-white/90 px-2 py-0.5 rounded-full border border-slate-200 shadow-sm backdrop-blur-sm">
-                  80μm Ultra-slim
-                </div>
-              </div>
-              <div class="p-6 md:p-8 flex-1 flex flex-col justify-between">
-                <div>
-                  <div class="flex items-baseline justify-between mb-2">
-                    <h3 class="text-xl md:text-2xl font-bold font-display text-slate-900 group-hover:text-brand-600 transition-colors">
-                      Black Matte Minimal
-                    </h3>
-                    <span class="text-2xl font-extrabold text-brand-600">5.99€</span>
-                  </div>
-                  <p class="text-sm text-slate-500 font-medium mb-4">Stealth Carbon & Detalle Dorado</p>
-                  <p class="text-xs text-slate-600 leading-relaxed mb-6">Elegancia pura en negro mate profundo con sutiles acentos geométricos dorados.</p>
-                  <ul class="space-y-2.5 mb-6 border-t border-slate-100 pt-4">
-                    <li class="flex items-center gap-2 text-xs text-slate-700">
-                      <i data-lucide="check-circle-2" class="w-4 h-4 text-brand-600 shrink-0"></i>
-                      <span>Textura mate anti-huellas dactilares</span>
-                    </li>
-                    <li class="flex items-center gap-2 text-xs text-slate-700">
-                      <i data-lucide="check-circle-2" class="w-4 h-4 text-brand-600 shrink-0"></i>
-                      <span>Líneas termoestampadas doradas</span>
-                    </li>
-                    <li class="flex items-center gap-2 text-xs text-slate-700">
-                      <i data-lucide="check-circle-2" class="w-4 h-4 text-brand-600 shrink-0"></i>
-                      <span>Grosor ultra-fino de 80 micras</span>
-                    </li>
-                  </ul>
-                </div>
-                <div>
-                  <div class="flex items-center justify-between text-xs mb-4 bg-blue-50/70 px-3.5 py-2.5 rounded-xl border border-blue-100">
-                    <span class="flex items-center gap-1.5 text-brand-700 font-bold">
-                      <i data-lucide="truck" class="w-3.5 h-3.5"></i> Envío gratis incluido
-                    </span>
-                    <span class="text-slate-500 font-medium">Stock Limitado</span>
-                  </div>
-                  <button 
-                    type="button" 
-                    onclick="openCheckoutModal('black-matte-minimal')"
-                    class="w-full py-3.5 px-6 rounded-2xl bg-brand-600 hover:bg-brand-700 text-white font-extrabold text-sm md:text-base tracking-wide flex items-center justify-center gap-2 shadow-md shadow-brand-600/25 hover:shadow-brand-600/40 hover:scale-[1.02] active:scale-[0.98] transition-all cursor-pointer"
-                  >
-                    <i data-lucide="shopping-bag" class="w-4 h-4"></i>
-                    <span>Me interesa este diseño</span>
-                  </button>
-                </div>
-              </div>
-            </article>
-
-            </template>
           </div>
+          <nav id="catalog-pagination" class="mt-7 flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-slate-200 bg-white px-4 py-3" aria-label="Paginación del catálogo"></nav>
 
           <!-- Banner Informativo de Garantía de Calidad (Blanco y Azul) -->
           <div class="mt-16 rounded-3xl bg-white border border-slate-200/90 p-6 md:p-8 flex flex-col md:flex-row items-center justify-between gap-6 shadow-sm">
@@ -859,64 +627,98 @@
         </button>
       </div>
 
-      <!-- Formulario de registro y reserva de interés -->
-      <div id="modal-checkout-view" class="p-6 space-y-6">
-        
-        <!-- Tarjeta de Producto Seleccionado -->
-        <div class="p-4 rounded-2xl bg-blue-50/60 border border-blue-100 flex items-center gap-4">
-          <div class="w-20 h-14 rounded-xl bg-slate-100 overflow-hidden flex items-center justify-center p-1 border border-slate-200 shrink-0">
-            <img 
-              id="modal-selected-img" 
-              src="/products/catalog-001.webp"
-              alt="Modelo seleccionado" 
-              class="w-full h-full object-contain"
-            />
+      <div id="modal-checkout-view" class="max-h-[82vh] overflow-y-auto p-5 sm:p-6">
+        <form id="reservation-form" class="space-y-5" novalidate>
+          <div class="checkout-steps" role="tablist" aria-label="Pasos para solicitar el diseño">
+            <button type="button" class="checkout-step is-active" role="tab" id="checkout-tab-1" aria-controls="checkout-panel-1" aria-selected="true" data-checkout-step="1">
+              <span class="checkout-step-number">1</span><span>Diseño</span>
+            </button>
+            <button type="button" class="checkout-step" role="tab" id="checkout-tab-2" aria-controls="checkout-panel-2" aria-selected="false" tabindex="-1" data-checkout-step="2">
+              <span class="checkout-step-number">2</span><span>Tus datos</span>
+            </button>
+            <button type="button" class="checkout-step" role="tab" id="checkout-tab-3" aria-controls="checkout-panel-3" aria-selected="false" tabindex="-1" data-checkout-step="3">
+              <span class="checkout-step-number">3</span><span>Acceso</span>
+            </button>
           </div>
-          <div class="flex-1 min-w-0">
-            <span class="text-[11px] font-mono text-brand-600 uppercase font-bold tracking-wider">Modelo Elegido</span>
-            <h4 id="modal-selected-name" class="text-base font-bold text-slate-900 truncate">Pegatinas Papel Roto para Tarjetas de Crédito - Modelo z1</h4>
-            <span id="modal-selected-price" class="text-xs font-bold text-slate-700">9,99 € · Envío gratis</span>
-          </div>
-        </div>
 
-        <!-- Selector de Modelo -->
-        <div class="space-y-1.5">
-          <label for="checkout-model-select" class="block text-xs font-bold uppercase tracking-wider text-slate-700">
-            Cambiar modelo si lo deseas
-          </label>
-          <select 
-            id="checkout-model-select" 
-            class="w-full px-4 py-3 rounded-xl bg-white border border-slate-300 text-slate-900 text-sm focus:outline-none focus:border-brand-600 focus:ring-1 focus:ring-brand-600 transition-colors cursor-pointer"
-          ></select>
-        </div>
+          <div id="modal-info-message" class="hidden rounded-xl border border-blue-200 bg-blue-50 p-3 text-xs text-blue-800" role="status" aria-live="polite"></div>
+          <div id="modal-error-message" class="hidden rounded-xl border border-rose-200 bg-rose-50 p-3 text-xs text-rose-700" role="alert"></div>
 
-        <form id="reservation-form" class="space-y-4">
-          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-            <div class="space-y-1.5">
-              <label for="checkout-first-name" class="block text-xs font-bold uppercase tracking-wider text-slate-700">Nombre *</label>
-              <input id="checkout-first-name" name="given-name" type="text" autocomplete="given-name" required placeholder="Tu nombre" class="w-full px-4 py-3 rounded-xl bg-white border border-slate-300 text-slate-900 text-sm placeholder-slate-400 focus:outline-none focus:border-brand-600 focus:ring-1 focus:ring-brand-600" />
+          <section id="checkout-panel-1" class="checkout-panel space-y-4" role="tabpanel" aria-labelledby="checkout-tab-1" data-checkout-panel="1">
+            <div>
+              <h4 class="text-base font-extrabold text-slate-900">Tu diseño favorito</h4>
+              <p class="mt-1 text-xs text-slate-500">Revisa el modelo antes de continuar.</p>
             </div>
-            <div class="space-y-1.5">
-              <label for="checkout-last-name" class="block text-xs font-bold uppercase tracking-wider text-slate-700">Apellidos *</label>
-              <input id="checkout-last-name" name="family-name" type="text" autocomplete="family-name" required placeholder="Tus apellidos" class="w-full px-4 py-3 rounded-xl bg-white border border-slate-300 text-slate-900 text-sm placeholder-slate-400 focus:outline-none focus:border-brand-600 focus:ring-1 focus:ring-brand-600" />
+            <div class="overflow-hidden rounded-2xl border border-slate-200 bg-white">
+              <div class="flex items-center gap-4 p-4">
+                <div class="h-20 w-24 shrink-0 overflow-hidden rounded-xl bg-slate-50 p-1">
+                  <img id="modal-selected-img" src="/products/catalog-001.webp" alt="Modelo seleccionado" class="h-full w-full object-contain" />
+                </div>
+                <div class="min-w-0 flex-1">
+                  <span class="text-[10px] font-bold uppercase tracking-wider text-brand-600">Modelo elegido</span>
+                  <h4 id="modal-selected-name" class="mt-1 text-sm font-bold leading-snug text-slate-900">Pegatinas Papel Roto para Tarjetas de Crédito - Modelo z1</h4>
+                  <span id="modal-selected-price" class="mt-1 block text-sm font-extrabold text-slate-800">9,99 € · Envío gratis</span>
+                </div>
+              </div>
+              <div class="border-t border-slate-100 bg-slate-50 px-4 py-3">
+                <label for="checkout-model-select" class="mb-1.5 block text-[10px] font-bold uppercase tracking-wider text-slate-600">Cambiar diseño</label>
+                <select id="checkout-model-select" class="w-full rounded-xl border border-slate-300 bg-white px-3 py-2.5 text-xs text-slate-900 focus:border-brand-600 focus:outline-none focus:ring-1 focus:ring-brand-600"></select>
+              </div>
             </div>
-          </div>
-          <div class="space-y-1.5">
-            <label for="checkout-email" class="block text-xs font-bold uppercase tracking-wider text-slate-700">Correo electrónico *</label>
-            <input id="checkout-email" name="email" type="email" autocomplete="email" required placeholder="ejemplo@correo.com" class="w-full px-4 py-3 rounded-xl bg-white border border-slate-300 text-slate-900 text-sm placeholder-slate-400 focus:outline-none focus:border-brand-600 focus:ring-1 focus:ring-brand-600" />
-          </div>
+            <div class="flex items-center justify-between rounded-xl bg-emerald-50 px-4 py-3 text-xs">
+              <span class="font-bold text-emerald-800">Envío</span><span class="font-extrabold text-emerald-800">Gratis</span>
+            </div>
+            <button type="button" data-step-next="2" class="w-full rounded-xl bg-brand-600 px-4 py-3.5 text-sm font-extrabold text-white transition-colors hover:bg-brand-700">
+              Continuar con mis datos <i data-lucide="arrow-right" class="ml-1 inline h-4 w-4"></i>
+            </button>
+          </section>
 
-          <div id="modal-info-message" class="hidden p-3 rounded-xl bg-blue-50 border border-blue-200 text-blue-800 text-xs" role="status" aria-live="polite"></div>
-          <div id="modal-error-message" class="hidden p-3 rounded-xl bg-rose-50 border border-rose-200 text-rose-700 text-xs" role="alert"></div>
+          <section id="checkout-panel-2" class="checkout-panel hidden space-y-4" role="tabpanel" aria-labelledby="checkout-tab-2" data-checkout-panel="2" hidden>
+            <div>
+              <h4 class="text-base font-extrabold text-slate-900">¿A nombre de quién lo guardamos?</h4>
+              <p class="mt-1 text-xs text-slate-500">Usaremos estos datos para identificar tu solicitud.</p>
+            </div>
+            <div class="grid grid-cols-1 gap-3 sm:grid-cols-2">
+              <label class="space-y-1.5 text-xs font-bold text-slate-700" for="checkout-first-name">
+                Nombre *
+                <input id="checkout-first-name" name="given-name" type="text" autocomplete="given-name" required placeholder="Tu nombre" class="w-full rounded-xl border border-slate-300 bg-white px-4 py-3 text-sm font-normal text-slate-900 placeholder:text-slate-400 focus:border-brand-600 focus:outline-none focus:ring-1 focus:ring-brand-600" />
+              </label>
+              <label class="space-y-1.5 text-xs font-bold text-slate-700" for="checkout-last-name">
+                Apellidos *
+                <input id="checkout-last-name" name="family-name" type="text" autocomplete="family-name" required placeholder="Tus apellidos" class="w-full rounded-xl border border-slate-300 bg-white px-4 py-3 text-sm font-normal text-slate-900 placeholder:text-slate-400 focus:border-brand-600 focus:outline-none focus:ring-1 focus:ring-brand-600" />
+              </label>
+            </div>
+            <div class="flex gap-3">
+              <button type="button" data-step-back="1" class="w-1/3 rounded-xl border border-slate-300 px-4 py-3 text-sm font-bold text-slate-700 hover:bg-slate-50">Atrás</button>
+              <button type="button" data-step-next="3" class="flex-1 rounded-xl bg-brand-600 px-4 py-3 text-sm font-extrabold text-white transition-colors hover:bg-brand-700">Continuar al acceso</button>
+            </div>
+          </section>
 
-          <button type="submit" id="reservation-submit-btn" class="w-full py-3.5 px-4 rounded-xl bg-brand-600 hover:bg-brand-700 text-white font-extrabold text-sm transition-all cursor-pointer">
-            Continuar por correo
-          </button>
-          <p class="text-[11px] text-center text-slate-500 leading-relaxed">
-            Te enviaremos un enlace para iniciar sesión. Al confirmarlo, registraremos tu interés y te avisaremos por correo en 7 días. No se realizará ningún cobro ahora.
-          </p>
+          <section id="checkout-panel-3" class="checkout-panel hidden space-y-4" role="tabpanel" aria-labelledby="checkout-tab-3" data-checkout-panel="3" hidden>
+            <div>
+              <h4 class="text-base font-extrabold text-slate-900">Accede de forma segura</h4>
+              <p class="mt-1 text-xs text-slate-500">Te enviaremos un enlace por correo; no necesitas crear una contraseña.</p>
+            </div>
+            <label for="checkout-email" class="block space-y-1.5 text-xs font-bold text-slate-700">
+              Correo electrónico *
+              <input id="checkout-email" name="email" type="email" autocomplete="email" required placeholder="ejemplo@correo.com" class="w-full rounded-xl border border-slate-300 bg-white px-4 py-3 text-sm font-normal text-slate-900 placeholder:text-slate-400 focus:border-brand-600 focus:outline-none focus:ring-1 focus:ring-brand-600" />
+            </label>
+            <div class="rounded-xl border border-slate-200 bg-slate-50 p-4 text-xs">
+              <div class="flex justify-between gap-3 text-slate-600"><span>Diseño</span><strong id="checkout-review-name" class="text-right text-slate-900">Modelo elegido</strong></div>
+              <div class="mt-2 flex justify-between text-slate-600"><span>Envío</span><strong class="text-emerald-700">Gratis</strong></div>
+              <div class="mt-3 flex justify-between border-t border-slate-200 pt-3 text-sm font-extrabold text-slate-900"><span>Total orientativo</span><strong id="checkout-review-price">9,99 €</strong></div>
+            </div>
+            <div class="flex gap-3">
+              <button type="button" data-step-back="2" class="w-1/3 rounded-xl border border-slate-300 px-4 py-3 text-sm font-bold text-slate-700 hover:bg-slate-50">Atrás</button>
+              <button type="submit" id="reservation-submit-btn" class="flex-1 rounded-xl bg-brand-600 px-4 py-3 text-sm font-extrabold text-white transition-colors hover:bg-brand-700">
+                Enviarme el enlace seguro
+              </button>
+            </div>
+            <p class="text-center text-[11px] leading-relaxed text-slate-500">
+              Al confirmar registrarás tu interés. No es un pedido confirmado y no se realizará ningún cobro ahora.
+            </p>
+          </section>
         </form>
-
       </div>
 
       <!-- Confirmación de registro -->
@@ -980,141 +782,6 @@
     <!-- ========================================== -->
     <!-- SCRIPT PRINCIPAL MODULAR Y RESILIENTE      -->
     <!-- ========================================== -->
-    <script type="text/plain">
-      // 1. Datos de Productos
-      const APP_PRODUCTS = [
-        {
-          id: 'cyberpunk-neon',
-          name: 'Cyberpunk Neon',
-          subtitle: 'Estética Synthwave & Circuito Digital',
-          priceFormatted: '5.99€',
-          image: './mockups/mockup-cyberpunk.png'
-        },
-        {
-          id: 'retro-wave',
-          name: 'Retro Wave',
-          subtitle: 'Atardecer Ochentero & Neon Grid',
-          priceFormatted: '5.99€',
-          image: './mockups/mockup-retro.png'
-        },
-        {
-          id: 'black-matte-minimal',
-          name: 'Black Matte Minimal',
-          subtitle: 'Stealth Carbon & Detalle Dorado',
-          priceFormatted: '5.99€',
-          image: './mockups/mockup-minimal.png'
-        }
-      ];
 
-      let selectedProduct = APP_PRODUCTS[0];
-
-      // 2. Inicializar Iconos Lucide
-      function refreshIcons() {
-        if (window.lucide && typeof window.lucide.createIcons === 'function') {
-          window.lucide.createIcons();
-        }
-      }
-
-      // 3. Controlador 3D del Hero Card
-      function setupCard3D() {
-        const card = document.getElementById('hero-3d-card');
-        const container = document.getElementById('hero-card-container');
-        const glare = document.getElementById('hero-card-glare');
-
-        if (!card || !container) return;
-
-        let bounds = container.getBoundingClientRect();
-        function updateBounds() {
-          bounds = container.getBoundingClientRect();
-        }
-        window.addEventListener('resize', updateBounds);
-        window.addEventListener('scroll', updateBounds, { passive: true });
-
-        container.addEventListener('pointermove', (e) => {
-          const mouseX = e.clientX - bounds.left;
-          const mouseY = e.clientY - bounds.top;
-          const px = mouseX / bounds.width;
-          const py = mouseY / bounds.height;
-          const rY = (px - 0.5) * 26;
-          const rX = (0.5 - py) * 26;
-
-          card.style.transform = `perspective(1000px) rotateX(${rX.toFixed(2)}deg) rotateY(${rY.toFixed(2)}deg) scale3d(1.02, 1.02, 1.02)`;
-
-          if (glare) {
-            glare.style.setProperty('--mouse-x', `${(px * 100).toFixed(1)}%`);
-            glare.style.setProperty('--mouse-y', `${(py * 100).toFixed(1)}%`);
-            glare.style.setProperty('--glare-opacity', '0.45');
-          }
-        });
-
-        container.addEventListener('pointerleave', () => {
-          card.style.transform = 'perspective(1000px) rotateX(0deg) rotateY(0deg) scale3d(1, 1, 1)';
-          if (glare) glare.style.setProperty('--glare-opacity', '0');
-        });
-      }
-
-      // 4. Selector de diseño en el Hero
-      function setupHeroSelectors() {
-        const previewImg = document.getElementById('hero-card-preview-img');
-        const previewName = document.getElementById('hero-card-name');
-        const previewSubtitle = document.getElementById('hero-card-subtitle');
-        const previewBuyBtn = document.getElementById('hero-preview-buy-btn');
-        const buttons = document.querySelectorAll('.hero-design-selector');
-
-        function setDesign(id) {
-          const p = APP_PRODUCTS.find(item => item.id === id) || APP_PRODUCTS[0];
-          selectedProduct = p;
-
-          if (previewImg) previewImg.src = p.image;
-          if (previewName) previewName.textContent = p.name;
-          if (previewSubtitle) previewSubtitle.textContent = p.subtitle;
-
-          buttons.forEach(btn => {
-            if (btn.getAttribute('data-design-id') === id) {
-              btn.className = 'hero-design-selector px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all bg-brand-600 text-white shadow-sm cursor-pointer';
-            } else {
-              btn.className = 'hero-design-selector px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all bg-white text-slate-600 hover:text-brand-600 hover:bg-blue-50 cursor-pointer';
-            }
-          });
-        }
-
-        buttons.forEach(btn => {
-          btn.addEventListener('click', () => {
-            setDesign(btn.getAttribute('data-design-id'));
-          });
-        });
-
-        if (previewBuyBtn) {
-          previewBuyBtn.addEventListener('click', () => {
-            openCheckoutModal(selectedProduct.id);
-          });
-        }
-      }
-
-      // Menú móvil
-      function setupMobileMenu() {
-        const btn = document.getElementById('mobile-menu-btn');
-        const nav = document.getElementById('mobile-nav');
-        if (btn && nav) {
-          btn.addEventListener('click', () => nav.classList.toggle('hidden'));
-          nav.querySelectorAll('a').forEach(l => l.addEventListener('click', () => nav.classList.add('hidden')));
-        }
-      }
-
-      // Ejecutar cuando el DOM esté listo
-      document.addEventListener('DOMContentLoaded', () => {
-        refreshIcons();
-        setupCard3D();
-        setupHeroSelectors();
-        setupMobileMenu();
-      });
-
-      if (document.readyState === 'interactive' || document.readyState === 'complete') {
-        refreshIcons();
-        setupCard3D();
-        setupHeroSelectors();
-        setupMobileMenu();
-      }
-    </script>
   </body>
 </html>

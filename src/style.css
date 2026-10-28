@@ -56,93 +56,120 @@ dialog::backdrop {
   box-shadow: 3px 3px 0px #000000;
 }
 
-.product-carousel {
-  display: flex;
-  gap: 1rem;
-  overflow-x: auto;
-  padding-bottom: 0.75rem;
-  scroll-behavior: smooth;
-  scroll-snap-type: x mandatory;
-  scrollbar-width: none;
-}
-
-.product-carousel::-webkit-scrollbar {
-  display: none;
-}
-
-.product-slide {
-  flex: 0 0 min(84%, 22rem);
-  scroll-snap-align: start;
-}
-
-.product-empty {
-  flex: 0 0 100%;
-  padding: 3rem 1rem;
-  color: #64748b;
-  text-align: center;
-}
-
-.carousel-control {
-  display: inline-flex;
-  width: 2.5rem;
-  height: 2.5rem;
-  align-items: center;
-  justify-content: center;
-  border: 1px solid #cbd5e1;
-  border-radius: 0.75rem;
-  background: #fff;
-  color: #334155;
-  transition: background-color 150ms ease, color 150ms ease, opacity 150ms ease;
-}
-
-.carousel-control:hover:not(:disabled) {
-  background: #eff6ff;
-  color: #2563eb;
-}
-
-.carousel-control:disabled {
-  cursor: not-allowed;
-  opacity: 0.4;
+.catalog-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 1.25rem;
 }
 
 @media (min-width: 640px) {
-  .product-slide {
-    flex-basis: calc((100% - 1rem) / 2);
+  .catalog-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
 
 @media (min-width: 1024px) {
-  .product-slide {
-    flex-basis: calc((100% - 2rem) / 3);
+  .catalog-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
   }
 }
 
-/* 3D Card Interactive Perspective */
-.card-perspective-container {
-  perspective: 1000px;
+.catalog-page-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.35rem;
+  min-height: 2.5rem;
+  padding: 0 0.85rem;
+  border: 1px solid #cbd5e1;
+  border-radius: 0.75rem;
+  background: #fff;
+  color: #334155;
+  font-size: 0.75rem;
+  font-weight: 700;
+  transition: background-color 150ms ease, color 150ms ease, opacity 150ms ease;
 }
 
-.card-3d-element {
+.catalog-page-button:hover:not(:disabled) {
+  background: #eff6ff;
+  color: #2563eb;
+}
+
+.catalog-page-button:disabled {
+  cursor: not-allowed;
+  opacity: 0.4;
+}
+
+.hero-mascot-3d {
+  perspective: 700px;
+  filter: drop-shadow(0 18px 22px rgba(37, 99, 235, 0.2));
+}
+
+.hero-mascot-3d img {
+  animation: mascot-float 5s ease-in-out infinite;
   transform-style: preserve-3d;
-  transition: transform 0.15s ease-out;
-  will-change: transform;
+  transition: transform 300ms ease;
 }
 
-/* Glare & Sheen Effect */
-.card-glare {
-  position: absolute;
-  inset: 0;
-  border-radius: inherit;
-  pointer-events: none;
-  background: radial-gradient(
-    circle at var(--mouse-x, 50%) var(--mouse-y, 50%),
-    rgba(255, 255, 255, 0.35) 0%,
-    rgba(255, 255, 255, 0.05) 45%,
-    transparent 70%
-  );
-  opacity: var(--glare-opacity, 0);
-  transition: opacity 0.2s ease;
-  mix-blend-mode: overlay;
+.hero-mascot-3d:hover img {
+  transform: rotateY(-12deg) rotateX(5deg) scale(1.05);
+}
+
+@keyframes mascot-float {
+  0%, 100% { transform: translateY(0) rotateY(-5deg); }
+  50% { transform: translateY(-8px) rotateY(5deg); }
+}
+
+.checkout-steps {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.5rem;
+  border-bottom: 1px solid #e2e8f0;
+  padding-bottom: 1rem;
+}
+
+.checkout-step {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  color: #64748b;
+  font-size: 0.7rem;
+  font-weight: 700;
+}
+
+.checkout-step-number {
+  display: grid;
+  width: 1.5rem;
+  height: 1.5rem;
+  place-items: center;
+  border: 1px solid #cbd5e1;
+  border-radius: 9999px;
+  background: #fff;
+  font-size: 0.65rem;
+}
+
+.checkout-step.is-active {
+  color: #1d4ed8;
+}
+
+.checkout-step.is-active .checkout-step-number,
+.checkout-step.is-complete .checkout-step-number {
+  border-color: #2563eb;
+  background: #2563eb;
+  color: #fff;
+}
+
+.checkout-step:disabled {
+  cursor: not-allowed;
+  opacity: 0.45;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hero-mascot-3d img {
+    animation: none;
+    transition: none;
+  }
 }
 
 /* Custom Scrollbar */
@@ -159,4 +186,3 @@ dialog::backdrop {
 ::-webkit-scrollbar-thumb:hover {
   background: #374151;
 }
-
