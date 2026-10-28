@@ -1,8 +1,8 @@
 import { createClient } from '@supabase/supabase-js';
 
-// Variables públicas de Supabase cargadas por Vite / Vercel.
-const supabaseUrl = import.meta.env.VITE_SUPABASE_URL || '';
-const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY || '';
+// La publishable key es pública por diseño; RLS debe proteger los datos.
+const supabaseUrl = import.meta.env.VITE_SUPABASE_URL || 'https://fxaswvfoebgmijbnpxfk.supabase.co';
+const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY || 'sb_publishable_cdOkM21VoQph4oLQnXE3sQ_l0x_8f43';
 
 export const isSupabaseConfigured = Boolean(
   supabaseUrl && 

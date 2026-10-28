@@ -51,7 +51,7 @@ Catálogo de pegatinas de vinilo para tarjetas. Las personas interesadas se regi
 
 ## ⚙️ Variables de Entorno
 
-Crea un archivo `.env.local` en la raíz del proyecto:
+Crea un archivo `.env.local` en la raíz del proyecto para sobrescribir la configuración pública predeterminada:
 
 ```bash
 # Supabase: la publishable key es apta para el cliente junto con RLS
