@@ -1,6 +1,6 @@
 # TargetSticker — Registro de interés para pegatinas
 
-Catálogo de pegatinas de vinilo para tarjetas. Las personas interesadas se registran con nombre, apellidos y correo; confirman su correo con un enlace de acceso y reciben el aviso de que compartiremos novedades en 7 días.
+Catálogo de pegatinas de vinilo para tarjetas. Las personas interesadas se registran con nombre, apellidos, correo y contraseña; se repite el correo para evitar errores y reciben el aviso de que compartiremos novedades en 7 días.
 
 ---
 
@@ -17,8 +17,8 @@ Catálogo de pegatinas de vinilo para tarjetas. Las personas interesadas se regi
      - 🖤 **Black Matte Minimal** (5.99€ · Envío gratis)
    - Fácilmente ampliable: solo añade un nuevo objeto al array `PRODUCTS`.
 3. **Registro de interés**:
-   - El modal `<dialog>` solicita nombre, apellidos y correo.
-   - Supabase Auth envía un enlace de acceso por correo; la solicitud solo se registra después de iniciar sesión.
+   - El modal `<dialog>` solicita correo dos veces, nombre, apellidos y contraseña.
+   - Supabase Auth crea la cuenta con correo y contraseña; la solicitud solo se registra después de iniciar sesión.
    - No se procesa ningún pago en esta fase.
    - La pantalla de confirmación informa del aviso previsto en 7 días.
    - El buscador del catálogo filtra por texto y por etiquetas configuradas en cada diseño.
@@ -43,7 +43,7 @@ Catálogo de pegatinas de vinilo para tarjetas. Las personas interesadas se regi
 1. Crea un proyecto gratuito en [Supabase](https://supabase.com).
 2. Ve a la sección **SQL Editor** en el menú lateral.
 3. Copia y pega el contenido del archivo [`supabase_schema.sql`](./supabase_schema.sql) y pulsa **Run**.
-4. En **Authentication > URL Configuration**, configura el **Site URL** y añade a **Redirect URLs** los orígenes permitidos, por ejemplo `http://localhost:5173/**` y el dominio de producción de Vercel. El enlace mágico vuelve a la página desde la que se solicitó.
+4. En **Authentication > URL Configuration**, configura el **Site URL** y añade a **Redirect URLs** los orígenes permitidos, por ejemplo `http://localhost:5173/**` y el dominio de producción de Vercel. Para esta versión no se usa verificación por enlace mágico; la cuenta se crea con correo y contraseña.
 5. Obtén la **Project URL** y la **publishable key** desde **Project Settings > API**. La clave secreta no se debe usar en el navegador.
 
 ---

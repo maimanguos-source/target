@@ -24,8 +24,10 @@ export function initCheckoutModal() {
   const accountForm = document.getElementById('reservation-form');
   const accountSubmit = document.getElementById('reservation-submit-btn');
   const emailInput = document.getElementById('checkout-email');
+  const emailConfirmInput = document.getElementById('checkout-email-confirm');
   const firstNameInput = document.getElementById('checkout-first-name');
   const lastNameInput = document.getElementById('checkout-last-name');
+  const passwordInput = document.getElementById('checkout-password');
   const infoMessage = document.getElementById('modal-info-message');
   const errorMessage = document.getElementById('modal-error-message');
   const accountReviewEmail = document.getElementById('account-review-email');
@@ -359,8 +361,17 @@ export function initCheckoutModal() {
         emailInput.reportValidity();
         return;
       }
-      if (accountStep === 2 && (!firstNameInput.value.trim() || !lastNameInput.value.trim())) {
-        setAccountMessage('Escribe tu nombre y apellidos para continuar.', 'error');
+      if (accountStep === 2) {
+        const email = emailInput.value.trim().toLowerCase();
+        const repeatedEmail = emailConfirmInput.value.trim().toLowerCase();
+        if (!emailConfirmInput.checkValidity() || email !== repeatedEmail) {
+          setAccountMessage('Los correos no coinciden. Escríbelos igual para continuar.', 'error');
+          emailConfirmInput.focus();
+          return;
+        }
+      }
+      if (accountStep === 3 && (!firstNameInput.value.trim() || !lastNameInput.value.trim() || !passwordInput.value.trim())) {
+        setAccountMessage('Escribe tu nombre, apellidos y contraseña para continuar.', 'error');
         return;
       }
       maxAccountStep = Math.max(maxAccountStep, Number(button.dataset.stepNext));
@@ -380,36 +391,47 @@ export function initCheckoutModal() {
     }
     if (isSendingLink) return;
     const email = emailInput.value.trim().toLowerCase();
+    const repeatedEmail = emailConfirmInput.value.trim().toLowerCase();
     const firstName = firstNameInput.value.trim();
     const lastName = lastNameInput.value.trim();
-    if (!emailInput.checkValidity() || !firstName || !lastName) {
-      setAccountMessage('Revisa tu correo, nombre y apellidos antes de continuar.', 'error');
+    const password = passwordInput.value.trim();
+
+    if (!emailInput.checkValidity() || !repeatedEmail || email !== repeatedEmail || !firstName || !lastName || !password) {
+      setAccountMessage('Revisa tu correo, nombre, apellidos y contraseña antes de continuar.', 'error');
+      return;
+    }
+    if (password.length < 6) {
+      setAccountMessage('La contraseña debe tener al menos 6 caracteres.', 'error');
+      passwordInput.focus();
       return;
     }
 
     isSendingLink = true;
     accountSubmit.disabled = true;
-    accountSubmit.textContent = 'Enviando enlace...';
+    accountSubmit.textContent = 'Creando cuenta...';
     try {
       const pending = getPendingAuth() || {};
       localStorage.setItem(PENDING_AUTH_KEY, JSON.stringify({ ...pending, firstName, lastName, email }));
-      const { error } = await supabase.auth.signInWithOtp({
+      const { data, error } = await supabase.auth.signUp({
         email,
+        password,
         options: {
-          shouldCreateUser: true,
-          data: { nombre: firstName, apellidos: lastName },
-          emailRedirectTo: `${window.location.origin}${window.location.pathname}`
+          data: { nombre: firstName, apellidos: lastName }
         }
       });
       if (error) throw error;
-      setAccountMessage('Enlace enviado. Ábrelo en este mismo navegador para iniciar sesión y guardar tu cesta.', 'info');
+      if (data?.session) {
+        setAccountMessage('Cuenta creada. Ya puedes seguir con tu cesta.', 'info');
+      } else {
+        setAccountMessage('Cuenta creada. Inicia sesión con este correo y la contraseña que has elegido para continuar.', 'info');
+      }
     } catch (error) {
-      console.error('No se pudo enviar el enlace de acceso:', error);
-      setAccountMessage(error.message || 'No se pudo enviar el enlace. Comprueba el correo e inténtalo de nuevo.', 'error');
+      console.error('No se pudo crear la cuenta:', error);
+      setAccountMessage(error.message || 'No se pudo crear la cuenta. Comprueba los datos e inténtalo de nuevo.', 'error');
     } finally {
       isSendingLink = false;
       accountSubmit.disabled = false;
-      accountSubmit.textContent = 'Enviarme el enlace';
+      accountSubmit.textContent = 'Crear cuenta';
     }
   });
 
