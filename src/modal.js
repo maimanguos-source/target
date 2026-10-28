@@ -41,7 +41,7 @@ export function initCheckoutModal() {
     activeModel = getProductById(productId);
     if (modalSelectedImg) modalSelectedImg.src = activeModel.image;
     if (modalSelectedName) modalSelectedName.textContent = activeModel.name;
-    if (modalSelectedPrice) modalSelectedPrice.textContent = activeModel.priceFormatted;
+    if (modalSelectedPrice) modalSelectedPrice.textContent = `${activeModel.priceFormatted} · Envío gratis`;
     if (modelSelect && modelSelect.value !== activeModel.id) {
       modelSelect.value = activeModel.id;
     }
@@ -271,4 +271,3 @@ export function initCheckoutModal() {
     });
   }
 }
-

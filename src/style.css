@@ -56,6 +56,67 @@ dialog::backdrop {
   box-shadow: 3px 3px 0px #000000;
 }
 
+.product-carousel {
+  display: flex;
+  gap: 1rem;
+  overflow-x: auto;
+  padding-bottom: 0.75rem;
+  scroll-behavior: smooth;
+  scroll-snap-type: x mandatory;
+  scrollbar-width: none;
+}
+
+.product-carousel::-webkit-scrollbar {
+  display: none;
+}
+
+.product-slide {
+  flex: 0 0 min(84%, 22rem);
+  scroll-snap-align: start;
+}
+
+.product-empty {
+  flex: 0 0 100%;
+  padding: 3rem 1rem;
+  color: #64748b;
+  text-align: center;
+}
+
+.carousel-control {
+  display: inline-flex;
+  width: 2.5rem;
+  height: 2.5rem;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid #cbd5e1;
+  border-radius: 0.75rem;
+  background: #fff;
+  color: #334155;
+  transition: background-color 150ms ease, color 150ms ease, opacity 150ms ease;
+}
+
+.carousel-control:hover:not(:disabled) {
+  background: #eff6ff;
+  color: #2563eb;
+}
+
+.carousel-control:disabled {
+  cursor: not-allowed;
+  opacity: 0.4;
+}
+
+@media (min-width: 640px) {
+  .product-slide {
+    flex-basis: calc((100% - 1rem) / 2);
+  }
+}
+
+@media (min-width: 1024px) {
+  .product-slide {
+    flex-basis: calc((100% - 2rem) / 3);
+  }
+}
+
 /* 3D Card Interactive Perspective */
 .card-perspective-container {
   perspective: 1000px;

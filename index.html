@@ -4,7 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>TargetSticker — Personaliza tu tarjeta con estilo | Pegatinas de Vinilo Premium</title>
-    <meta name="description" content="Pegatinas ultra-finas de vinilo mate de 80 micras para tarjetas de crédito y débito. Resistentes al agua, sin residuos y 100% compatibles con cajeros y contactless." />
+    <meta name="description" content="Pegatinas premium para tarjetas de crédito y débito, resistentes al agua y compatibles con contactless. Elige entre 134 diseños con envío gratis." />
     
     <!-- Favicon -->
     <link rel="icon" type="image/png" href="./mascot.png" />
@@ -152,8 +152,8 @@
     <!-- Top Announcement Bar (Azul y Blanco) -->
     <div class="bg-brand-600 text-white font-bold text-xs py-2.5 px-4 text-center tracking-wide flex items-center justify-center gap-2 shadow-sm">
       <span class="inline-block animate-pulse">⚡</span>
-      <span>HORNADA LIMITADA: ¡Todos los modelos a 5.99€ con Envío Gratis incluido!</span>
-      <span class="hidden sm:inline font-normal opacity-90">• Vinilo mate de 80μm antiburbujas</span>
+      <span>Diseños desde 7,99€ · Envío gratis</span>
+      <span class="hidden sm:inline font-normal opacity-90">• En todos los modelos</span>
     </div>
 
     <!-- 1. NAVBAR FIJO (Blanco y Azul) -->
@@ -190,7 +190,7 @@
         <div class="flex items-center gap-3">
           <button 
             type="button" 
-            onclick="openCheckoutModal('cyberpunk-neon')"
+            onclick="openCheckoutModal('catalog-001')"
             class="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-brand-600 text-white font-extrabold text-xs sm:text-sm hover:bg-brand-700 transition-all shadow-md shadow-brand-600/25 active:scale-95 cursor-pointer"
           >
             <i data-lucide="sparkles" class="w-4 h-4 text-white"></i>
@@ -237,7 +237,7 @@
                 <span class="w-2 h-2 rounded-full bg-brand-600 animate-ping"></span>
                 <span>Tirada Especial de Lanzamiento</span>
                 <span class="text-blue-300">•</span>
-                <span class="text-brand-700 font-extrabold">5.99€ Envío Gratis Incluido</span>
+                <span class="text-brand-700 font-extrabold">Envío gratis en todos los diseños</span>
               </div>
 
               <h1 class="text-4xl sm:text-5xl lg:text-6xl font-black font-display tracking-tight text-slate-900 leading-[1.15]">
@@ -258,12 +258,12 @@
                   class="w-full sm:w-auto px-8 py-4 rounded-2xl bg-brand-600 hover:bg-brand-700 text-white font-extrabold text-base tracking-wide flex items-center justify-center gap-2 shadow-lg shadow-brand-600/25 hover:shadow-brand-600/40 hover:scale-[1.02] active:scale-[0.98] transition-all cursor-pointer"
                 >
                   <i data-lucide="shopping-bag" class="w-5 h-5 text-white"></i>
-                  <span>Ver Colección (5.99€)</span>
+                  <span>Ver colección</span>
                 </a>
 
                 <button 
                   type="button" 
-                  onclick="openCheckoutModal('cyberpunk-neon')"
+                  onclick="openCheckoutModal('catalog-001')"
                   class="w-full sm:w-auto px-7 py-4 rounded-2xl bg-white hover:bg-blue-50/60 text-slate-700 hover:text-brand-700 font-bold text-base border border-slate-300 hover:border-brand-300 transition-all flex items-center justify-center gap-2 cursor-pointer shadow-sm"
                 >
                   <span>Pedir directamente</span>
@@ -272,7 +272,7 @@
               </div>
 
               <!-- Beneficios Rápidos (Bullet strip) -->
-              <div class="pt-6 border-t border-slate-200 grid grid-cols-3 gap-4 max-w-lg mx-auto lg:mx-0 text-left">
+              <div class="pt-6 border-t border-slate-200 grid grid-cols-2 sm:grid-cols-4 gap-4 max-w-2xl mx-auto lg:mx-0 text-left">
                 <div class="flex items-center gap-2.5">
                   <div class="w-8 h-8 rounded-xl bg-blue-50 border border-blue-200 text-brand-600 flex items-center justify-center shrink-0">
                     <i data-lucide="droplets" class="w-4 h-4"></i>
@@ -291,6 +291,12 @@
                   </div>
                   <span class="text-xs font-bold text-slate-700 leading-tight">Cero residuos pegajosos</span>
                 </div>
+                <div class="flex items-center gap-2.5">
+                  <div class="w-8 h-8 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-700 flex items-center justify-center shrink-0">
+                    <i data-lucide="truck" class="w-4 h-4"></i>
+                  </div>
+                  <span class="text-xs font-bold text-slate-700 leading-tight">Envío gratis</span>
+                </div>
               </div>
 
             </div>
@@ -299,27 +305,27 @@
             <div class="lg:col-span-5 flex flex-col items-center">
               
               <!-- Selector Rápido de Diseños (Blanco y Azul) -->
-              <div class="mb-4 flex flex-wrap items-center justify-center gap-2 p-1.5 bg-white rounded-2xl border border-slate-200 shadow-sm">
+              <div id="hero-design-selectors" class="mb-4 flex max-w-full flex-wrap items-center justify-center gap-2 rounded-2xl border border-slate-200 bg-white p-1.5 shadow-sm">
                 <button 
                   type="button" 
-                  data-design-id="cyberpunk-neon" 
+                  data-design-id="catalog-001"
                   class="hero-design-selector px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all bg-brand-600 text-white shadow-sm cursor-pointer"
                 >
-                  Cyberpunk
+                  Papel Roto
                 </button>
                 <button 
                   type="button" 
-                  data-design-id="retro-wave" 
+                  data-design-id="catalog-009"
                   class="hero-design-selector px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all bg-white text-slate-600 hover:text-brand-600 hover:bg-blue-50 cursor-pointer"
                 >
-                  Retro Wave
+                  Terror
                 </button>
                 <button 
                   type="button" 
-                  data-design-id="black-matte-minimal" 
+                  data-design-id="catalog-024"
                   class="hero-design-selector px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all bg-white text-slate-600 hover:text-brand-600 hover:bg-blue-50 cursor-pointer"
                 >
-                  Black Matte
+                  Anime
                 </button>
               </div>
 
@@ -336,7 +342,7 @@
                   <!-- Mockup de la Tarjeta con Sombra Realista -->
                   <img 
                     id="hero-card-preview-img" 
-                    src="./mockups/mockup-cyberpunk.png" 
+                    src="/products/catalog-001.webp"
                     alt="Vista previa de la pegatina para tarjeta de crédito" 
                     class="w-full h-full object-contain filter drop-shadow-[0_20px_25px_rgba(37,99,235,0.2)] transition-all duration-300"
                   />
@@ -355,8 +361,8 @@
 
               <!-- Info de la Tarjeta Seleccionada -->
               <div class="mt-4 text-center">
-                <h4 id="hero-card-name" class="text-base font-bold text-slate-900">Cyberpunk Neon</h4>
-                <p id="hero-card-subtitle" class="text-xs text-slate-500 mb-3">Estética Synthwave & Circuito Digital</p>
+                <h4 id="hero-card-name" class="text-base font-bold text-slate-900">Pegatinas Papel Roto - Z1</h4>
+                <p id="hero-card-subtitle" class="text-xs text-slate-500 mb-3">Diseño para tarjetas bancarias</p>
                 <button 
                   type="button" 
                   id="hero-preview-buy-btn"
@@ -379,17 +385,17 @@
           
           <div class="text-center max-w-3xl mx-auto mb-16 space-y-4">
             <div class="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-blue-100 text-brand-800 text-xs font-extrabold tracking-wider uppercase border border-blue-200">
-              Colección Exclusiva · Tirada de 100 unidades
+              134 modelos disponibles
             </div>
             <h2 class="text-3xl sm:text-4xl lg:text-5xl font-black font-display text-slate-900 tracking-tight">
               Diseños que hacen girar cabezas al pagar.
             </h2>
             <p class="text-slate-600 text-base sm:text-lg">
-              Cada pegatina ha sido troquelada con precisión micrométrica para adaptarse al formato estándar bancario sin tapar el chip ni interferir con la antena contactless.
+              Encuentra tu estilo entre 134 modelos. Vinilo troquelado con precisión para tarjetas bancarias y envío gratis en todos los diseños.
             </p>
           </div>
 
-          <div class="max-w-xl mx-auto mb-10">
+          <div class="max-w-xl mx-auto mb-6">
             <label for="product-search" class="sr-only">Buscar diseños por nombre, estilo o etiqueta</label>
             <div class="relative">
               <i data-lucide="search" class="w-5 h-5 absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"></i>
@@ -404,8 +410,17 @@
             <p id="product-search-status" class="mt-2 text-xs text-slate-500" aria-live="polite"></p>
           </div>
 
-          <!-- Grid de Productos (3 Tarjetas Blanco y Azul) -->
-          <div id="products-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+          <div class="mb-4 flex justify-end gap-2">
+            <button id="products-previous" type="button" aria-label="Productos anteriores" title="Productos anteriores" class="carousel-control" disabled>
+              <i data-lucide="chevron-left" class="h-5 w-5"></i>
+            </button>
+            <button id="products-next" type="button" aria-label="Más productos" title="Más productos" class="carousel-control">
+              <i data-lucide="chevron-right" class="h-5 w-5"></i>
+            </button>
+          </div>
+
+          <div id="products-grid" class="product-carousel" aria-label="Catálogo de modelos">
+            <template id="legacy-product-cards">
             
             <!-- Producto 1: Cyberpunk Neon -->
             <article data-product-card data-product-tags="cyberpunk neon synthwave digital cian magenta" class="group relative rounded-3xl bg-white border border-slate-200/90 overflow-hidden hover:border-brand-500 transition-all duration-300 hover:shadow-card-hover flex flex-col">
@@ -587,6 +602,7 @@
               </div>
             </article>
 
+            </template>
           </div>
 
           <!-- Banner Informativo de Garantía de Calidad (Blanco y Azul) -->
@@ -708,11 +724,11 @@
               <div class="pt-2">
                 <button 
                   type="button" 
-                  onclick="openCheckoutModal('cyberpunk-neon')"
+                  onclick="openCheckoutModal('catalog-001')"
                   class="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-white text-brand-700 font-extrabold text-sm hover:bg-blue-50 transition-all shadow-md active:scale-95 cursor-pointer"
                 >
                   <i data-lucide="sparkles" class="w-4 h-4 text-brand-600"></i>
-                  <span>Conseguir mi TargetSticker por 5.99€</span>
+                  <span>Ver diseños desde 7,99€</span>
                 </button>
               </div>
             </div>
@@ -755,7 +771,7 @@
               ¿Cómo funciona el envío y cuánto tarda?
             </h4>
             <p class="text-xs sm:text-sm text-slate-600 leading-relaxed">
-              El envío está 100% incluido en los 5.99€. Realizamos las tiradas bajo demanda para garantizar que el vinilo y adhesivo lleguen recién fabricados con máxima adherencia.
+              El envío es gratis en todos los modelos. El precio que ves incluye el envío; te confirmaremos los detalles de entrega antes de finalizar el pedido.
             </p>
           </div>
         </div>
@@ -849,15 +865,15 @@
           <div class="w-20 h-14 rounded-xl bg-slate-100 overflow-hidden flex items-center justify-center p-1 border border-slate-200 shrink-0">
             <img 
               id="modal-selected-img" 
-              src="./mockups/mockup-cyberpunk.png" 
+              src="/products/catalog-001.webp"
               alt="Modelo seleccionado" 
               class="w-full h-full object-contain"
             />
           </div>
           <div class="flex-1 min-w-0">
             <span class="text-[11px] font-mono text-brand-600 uppercase font-bold tracking-wider">Modelo Elegido</span>
-            <h4 id="modal-selected-name" class="text-base font-bold text-slate-900 truncate">Cyberpunk Neon</h4>
-            <span id="modal-selected-price" class="text-xs font-bold text-slate-700">5.99€ (Envío gratis)</span>
+            <h4 id="modal-selected-name" class="text-base font-bold text-slate-900 truncate">Pegatinas Papel Roto para Tarjetas de Crédito - Modelo z1</h4>
+            <span id="modal-selected-price" class="text-xs font-bold text-slate-700">9,99 € · Envío gratis</span>
           </div>
         </div>
 
@@ -869,11 +885,7 @@
           <select 
             id="checkout-model-select" 
             class="w-full px-4 py-3 rounded-xl bg-white border border-slate-300 text-slate-900 text-sm focus:outline-none focus:border-brand-600 focus:ring-1 focus:ring-brand-600 transition-colors cursor-pointer"
-          >
-            <option value="cyberpunk-neon">Cyberpunk Neon - 5.99€</option>
-            <option value="retro-wave">Retro Wave - 5.99€</option>
-            <option value="black-matte-minimal">Black Matte Minimal - 5.99€</option>
-          </select>
+          ></select>
         </div>
 
         <form id="reservation-form" class="space-y-4">
@@ -966,7 +978,7 @@
     <!-- ========================================== -->
     <!-- SCRIPT PRINCIPAL MODULAR Y RESILIENTE      -->
     <!-- ========================================== -->
-    <script>
+    <script type="text/plain">
       // 1. Datos de Productos
       const APP_PRODUCTS = [
         {
@@ -1102,6 +1114,6 @@
         setupMobileMenu();
       }
     </script>
-    <script type="module" src="/src/checkout-entry.js"></script>
+    <script type="module" src="/src/main.js"></script>
   </body>
 </html>
