@@ -46,6 +46,8 @@ export function initCheckoutModal() {
   const cartSuccess = document.getElementById('cart-success');
   const cartCount = document.getElementById('cart-count');
   const cartTotal = document.getElementById('cart-total');
+  const cartSubtotal = document.getElementById('cart-subtotal');
+  const cartClear = document.getElementById('cart-clear');
   const cartSubtitle = document.getElementById('cart-subtitle');
   const cartItemsView = document.getElementById('cart-items-view');
   const cartReviewView = document.getElementById('cart-review-view');
@@ -163,7 +165,9 @@ export function initCheckoutModal() {
       cartEmpty.classList.remove('hidden');
       cartItems.classList.add('hidden');
       cartTotal.textContent = euroFormatter.format(0);
+      cartSubtotal.textContent = euroFormatter.format(0);
       cartSubtitle.textContent = 'Inicia sesión para ver tu cesta';
+      cartClear.classList.add('hidden');
       updateCartBadge();
       return;
     }
@@ -174,13 +178,15 @@ export function initCheckoutModal() {
     cartEmpty.classList.toggle('hidden', items.length !== 0);
     cartSuccess.classList.add('hidden');
     cartTotal.textContent = euroFormatter.format(total);
+    cartSubtotal.textContent = euroFormatter.format(total);
+    cartClear.classList.toggle('hidden', items.length === 0);
     cartSubtitle.textContent = `${items.reduce((sum, item) => sum + item.quantity, 0)} ${items.length === 1 ? 'artículo' : 'artículos'} · envío gratis`;
     cartItems.innerHTML = items.map(({ product, quantity }) => `
       <article class="cart-line">
         <img src="${escapeHtml(product.image)}" alt="${escapeHtml(product.name)}" class="cart-line-image" />
         <div class="min-w-0 flex-1">
           <h3 class="line-clamp-2 text-sm font-bold text-slate-900">${escapeHtml(product.name)}</h3>
-          <p class="mt-1 text-xs font-extrabold text-slate-700">${product.priceFormatted} <span class="font-medium text-emerald-700">· envío gratis</span></p>
+          <p class="mt-1 text-xs font-semibold text-slate-500">${product.priceFormatted} por unidad <span class="font-medium text-emerald-700">· envío gratis</span></p>
           <div class="mt-2 flex items-center gap-2">
             <button type="button" class="cart-quantity-button" data-quantity="${escapeHtml(product.id)}" data-change="-1" aria-label="Quitar una unidad">−</button>
             <span class="min-w-5 text-center text-xs font-bold">${quantity}</span>
@@ -188,6 +194,7 @@ export function initCheckoutModal() {
             <button type="button" class="ml-auto text-xs font-semibold text-slate-500 underline hover:text-rose-600" data-remove="${escapeHtml(product.id)}">Quitar</button>
           </div>
         </div>
+        <strong class="shrink-0 text-sm font-black text-slate-900">${euroFormatter.format(product.price * quantity)}</strong>
       </article>
     `).join('');
     cartItems.querySelectorAll('[data-quantity]').forEach((button) => {
@@ -306,6 +313,11 @@ export function initCheckoutModal() {
   }
 
   document.getElementById('cart-button').addEventListener('click', showCartDialog);
+  cartClear.addEventListener('click', () => {
+    if (!currentUser) return;
+    clearCart(currentUser.id);
+    renderCart();
+  });
   document.getElementById('account-button').addEventListener('click', showAccountDialog);
   document.getElementById('mobile-account-button').addEventListener('click', () => {
     document.getElementById('mobile-nav').classList.add('hidden');
@@ -366,6 +378,7 @@ export function initCheckoutModal() {
       cartFooter.classList.add('hidden');
       cartSuccess.classList.remove('hidden');
       cartSuccess.classList.add('block');
+      cartClear.classList.add('hidden');
       cartItems.replaceChildren();
       cartEmpty.classList.add('hidden');
       cartSubtitle.textContent = 'Solicitud registrada · sin cobro hoy';
