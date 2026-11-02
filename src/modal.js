@@ -16,6 +16,11 @@ function escapeHtml(value) {
   })[character]);
 }
 
+function normalizeEmailInput(input) {
+  input.value = input.value.trim().toLowerCase();
+  return input.checkValidity();
+}
+
 export function initCheckoutModal() {
   const accountDialog = document.getElementById('checkout-modal');
   const cartDialog = document.getElementById('cart-dialog');
@@ -402,14 +407,18 @@ export function initCheckoutModal() {
   });
   accountForm.querySelectorAll('[data-step-next]').forEach((button) => {
     button.addEventListener('click', () => {
-      if (accountStep === 1 && !emailInput.checkValidity()) {
+      if (accountStep === 1 && !normalizeEmailInput(emailInput)) {
         emailInput.reportValidity();
         return;
       }
       if (accountStep === 2) {
-        const email = emailInput.value.trim().toLowerCase();
-        const repeatedEmail = emailConfirmInput.value.trim().toLowerCase();
-        if (!emailConfirmInput.checkValidity() || email !== repeatedEmail) {
+        const validEmail = normalizeEmailInput(emailInput);
+        const validRepeatedEmail = normalizeEmailInput(emailConfirmInput);
+        if (!validEmail || !validRepeatedEmail) {
+          emailConfirmInput.reportValidity();
+          return;
+        }
+        if (emailInput.value !== emailConfirmInput.value) {
           setAccountMessage('Los correos no coinciden. Escríbelos igual para continuar.', 'error');
           emailConfirmInput.focus();
           return;
@@ -435,14 +444,25 @@ export function initCheckoutModal() {
       return;
     }
     if (isSubmittingAuth) return;
-    const email = emailInput.value.trim().toLowerCase();
-    const repeatedEmail = emailConfirmInput.value.trim().toLowerCase();
+    const validEmail = normalizeEmailInput(emailInput);
+    const validRepeatedEmail = normalizeEmailInput(emailConfirmInput);
+    const email = emailInput.value;
+    const repeatedEmail = emailConfirmInput.value;
     const firstName = firstNameInput.value.trim();
     const lastName = lastNameInput.value.trim();
     const password = passwordInput.value;
 
-    if (!emailInput.checkValidity() || !repeatedEmail || email !== repeatedEmail || !firstName || !lastName || !password) {
-      setAccountMessage('Revisa tu correo, nombre, apellidos y contraseña antes de continuar.', 'error');
+    if (!validEmail || !validRepeatedEmail) {
+      setAccountMessage('Escribe un correo válido en ambos campos.', 'error');
+      return;
+    }
+    if (email !== repeatedEmail) {
+      setAccountMessage('Los correos no coinciden. Escríbelos igual antes de continuar.', 'error');
+      emailConfirmInput.focus();
+      return;
+    }
+    if (!firstName || !lastName || !password) {
+      setAccountMessage('Revisa tu nombre, apellidos y contraseña antes de continuar.', 'error');
       return;
     }
     if (password.length < 6) {
@@ -518,9 +538,10 @@ export function initCheckoutModal() {
       return;
     }
 
-    const email = loginEmailInput.value.trim().toLowerCase();
+    const validEmail = normalizeEmailInput(loginEmailInput);
+    const email = loginEmailInput.value;
     const password = loginPasswordInput.value;
-    if (!loginEmailInput.checkValidity() || !password) {
+    if (!validEmail || !password) {
       setAccountMessage('Escribe un correo válido y tu contraseña para iniciar sesión.', 'error');
       return;
     }
