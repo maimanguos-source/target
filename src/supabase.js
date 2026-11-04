@@ -25,7 +25,7 @@ if (!isSupabaseConfigured) {
 }
 
 /**
- * Guarda un pedido en la tabla "pedidos" de Supabase
+ * Guarda un pedido en la tabla "orders" de Supabase
  * Estructura de la tabla:
  * - id (UUID generado por defecto)
  * - email (Texto)
@@ -47,7 +47,7 @@ export async function registrarPedido({ userId, nombre, apellidos, email, modelo
   if (supabase) {
     try {
       const { data, error } = await supabase
-        .from('pedidos')
+        .from('orders')
         .insert([payload])
         .select();
 
@@ -61,7 +61,7 @@ export async function registrarPedido({ userId, nombre, apellidos, email, modelo
         };
       }
 
-      console.log('[Supabase] Pedido guardado exitosamente en la tabla "pedidos":', data);
+      console.log('[Supabase] Pedido guardado exitosamente en la tabla "orders":', data);
       return {
         success: true,
         data: data ? data[0] : payload,
@@ -96,7 +96,7 @@ export async function registrarPedidos(pedidos) {
   if (!payload.length) return { success: false, error: 'La cesta está vacía.' };
 
   try {
-    const { data, error } = await supabase.from('pedidos').insert(payload).select();
+    const { data, error } = await supabase.from('orders').insert(payload).select();
     if (error) {
       console.error('[Supabase] Error al guardar los pedidos de la cesta:', error.message, error);
       return { success: false, error: error.message };
